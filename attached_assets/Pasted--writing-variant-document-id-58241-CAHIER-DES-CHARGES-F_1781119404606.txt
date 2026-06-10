@@ -1,0 +1,1217 @@
+:::writing{variant="document" id="58241"}
+
+CAHIER DES CHARGES FONCTIONNEL ET TECHNIQUE
+
+LE KIOSQUE PÉDAGOGIQUE
+
+Version 2.0 – Spécification de référence pour développement
+
+
+---
+
+1. PRÉSENTATION GÉNÉRALE
+
+1.1 Contexte
+
+Le Kiosque Pédagogique est une plateforme de soutien pédagogique anonyme destinée aux enseignants d'un réseau d'établissements.
+
+Elle permet :
+
+à un enseignant de déposer anonymement une demande d'aide ;
+
+à un intervenant de niveau 1 (N1) de prendre en charge la demande ;
+
+à un expert de niveau 2 (N2) de traiter les demandes nécessitant une expertise transversale ;
+
+aux responsables pédagogiques (RD) et pilotes généraux (PG) de piloter l'activité à partir d'indicateurs agrégés.
+
+
+L'application repose exclusivement sur un modèle de consultation volontaire (« Pull »).
+
+Aucune notification externe n'est envoyée.
+
+
+---
+
+2. OBJECTIFS FONCTIONNELS
+
+Objectifs principaux
+
+Anonymat total des enseignants
+
+Aucune donnée nominative ne doit être collectée.
+
+Le système ne doit permettre à aucun utilisateur :
+
+d'identifier un enseignant ;
+
+de retrouver son identité ;
+
+d'associer plusieurs tickets à une même personne.
+
+
+Réactivité
+
+Permettre un traitement rapide des demandes :
+
+prise en charge locale par les N1 ;
+
+escalade vers N2 si nécessaire ;
+
+échange synchrone par messagerie.
+
+
+Pilotage
+
+Fournir des indicateurs fiables :
+
+volume des demandes ;
+
+délais de prise en charge ;
+
+motifs d'escalade ;
+
+besoins émergents.
+
+
+Conservation historique
+
+L'intégralité des tickets, messages et événements doit être conservée de manière permanente.
+
+Aucune suppression physique n'est prévue.
+
+
+---
+
+3. ARCHITECTURE TECHNIQUE
+
+Frontend
+
+Technologies
+
+React 18+
+
+TypeScript
+
+Tailwind CSS
+
+React Router
+
+React Query
+
+Zustand ou Redux Toolkit
+
+
+Contraintes
+
+Application SPA.
+
+Responsive mobile-first.
+
+Compatibilité :
+
+Chrome
+
+Safari iOS
+
+Firefox
+
+Edge
+
+
+
+---
+
+Backend
+
+Technologies
+
+NestJS
+
+TypeScript
+
+
+Modules
+
+Auth
+
+Users
+
+Tickets
+
+Messages
+
+Dashboard
+
+Socket Gateway
+
+Schools
+
+Disciplines
+
+Domains
+
+
+
+---
+
+Base de données
+
+SGBD
+
+PostgreSQL 16+
+
+
+---
+
+Temps réel
+
+Socket.io
+
+Uniquement pour :
+
+chat en direct ;
+
+mise à jour des tableaux de tickets ouverts.
+
+
+Aucune notification push.
+
+
+---
+
+Sécurité
+
+Authentification
+
+JWT
+
+Hachage
+
+Bcrypt
+
+Contrôles
+
+RBAC (Role Based Access Control)
+
+Rôles :
+
+anonymous_teacher
+
+n1
+
+n2
+
+rd
+
+pg
+
+admin
+
+
+Le rôle admin est réservé à l'administration technique.
+
+
+---
+
+4. MODÈLE DE DONNÉES
+
+4.1 Tables de référence
+
+schools
+
+id
+
+name
+
+city
+
+active
+
+
+disciplines
+
+id
+
+name
+
+active
+
+
+transversal_domains
+
+Exemples :
+
+Gestion de classe
+
+Évaluation
+
+Numérique
+
+Inclusion
+
+Différenciation
+
+
+
+---
+
+4.2 Utilisateurs
+
+users
+
+id
+
+email
+
+password_hash
+
+role
+
+school_id
+
+discipline_id
+
+active
+
+created_at
+
+updated_at
+
+
+
+---
+
+user_domains
+
+Relation N2 ↔ domaines transversaux.
+
+
+---
+
+4.3 Tickets
+
+Statuts
+
+new
+
+Ticket créé.
+
+assigned_n1
+
+Pris en charge par N1.
+
+escalated
+
+En attente d'expert N2.
+
+assigned_n2
+
+Pris en charge par N2.
+
+closed_n1
+
+Résolu au niveau 1.
+
+closed_resolved
+
+Résolu au niveau 2.
+
+closed_webex
+
+Orienté vers une session collective.
+
+
+---
+
+Champs
+
+tickets
+
+id
+
+password_hash
+
+assigned_n1_id
+
+assigned_n2_id
+
+school_id
+
+discipline_id
+
+transversal_domain_id
+
+description
+
+status
+
+webex_link
+
+webex_created_at
+
+created_at
+
+updated_at
+
+archived_at
+
+
+
+---
+
+4.4 Messages
+
+messages
+
+id
+
+ticket_id
+
+sender_id
+
+sender_type
+
+content
+
+message_type
+
+created_at
+
+
+
+---
+
+message_type
+
+Valeurs :
+
+text
+
+system
+
+webex
+
+
+
+---
+
+4.5 Historisation
+
+ticket_events
+
+Cette table est obligatoire.
+
+Elle permet :
+
+audit ;
+
+statistiques ;
+
+reconstitution des parcours.
+
+
+Structure
+
+id
+
+ticket_id
+
+actor_id
+
+actor_role
+
+event_type
+
+old_status
+
+new_status
+
+metadata JSONB
+
+created_at
+
+
+
+---
+
+Types d'événements
+
+ticket_created
+
+claimed_n1
+
+escalated
+
+claimed_n2
+
+resolved_n1
+
+resolved_n2
+
+webex_invitation
+
+message_sent
+
+
+
+---
+
+5. RÈGLES D'ANONYMAT
+
+Interdictions
+
+Aucune collecte :
+
+nom ;
+
+prénom ;
+
+email ;
+
+téléphone ;
+
+adresse IP stockée.
+
+
+
+---
+
+Conservation
+
+Le système ne doit jamais créer :
+
+table teachers ;
+
+table anonymous_users ;
+
+identifiant permanent enseignant.
+
+
+Chaque ticket constitue une identité autonome.
+
+
+---
+
+6. PARCOURS ENSEIGNANT
+
+Première visite
+
+Le frontend vérifie :
+
+localStorage.kiosque_token
+
+Si présent
+
+Ouverture directe du ticket.
+
+Sinon
+
+Affichage :
+
+Créer une demande
+
+Consulter un ticket existant
+
+
+
+---
+
+Création
+
+Informations demandées
+
+établissement
+
+discipline
+
+description
+
+
+
+---
+
+Génération des accès
+
+Le backend génère :
+
+Numéro
+
+Exemple
+
+#1045
+
+Mot de passe lisible
+
+Exemples :
+
+ROBOT-84-VERT
+AVION-22-BLEU
+LUNE-45-ROUGE
+
+Minimum :
+
+3 mots
+
+1 nombre
+
+
+
+---
+
+Écran obligatoire
+
+Le système affiche :
+
+numéro de ticket
+
+mot de passe
+
+
+L'utilisateur doit confirmer :
+
+J'ai noté mes identifiants
+
+avant de poursuivre.
+
+
+---
+
+7. RECONNEXION
+
+Accès
+
+Numéro de ticket
+
+
+Mot de passe
+
+
+---
+
+Validation
+
+Utilisation obligatoire :
+
+bcrypt.compare()
+
+
+---
+
+8. WORKFLOW NIVEAU 1
+
+Pool N1
+
+Conditions :
+
+status='new'
+AND school_id=user.school_id
+
+
+---
+
+Action
+
+Prendre en charge
+
+
+---
+
+Effet
+
+Transaction SQL :
+
+verrouillage
+
+attribution
+
+
+Passage :
+
+new
+→ assigned_n1
+
+
+---
+
+Résolution
+
+Passage :
+
+assigned_n1
+→ closed_n1
+
+
+---
+
+Escalade
+
+Choix obligatoire d'un domaine transversal.
+
+Passage :
+
+assigned_n1
+→ escalated
+
+
+---
+
+9. WORKFLOW NIVEAU 2
+
+Pool N2
+
+Conditions :
+
+status='escalated'
+
+et
+
+domaine dans user_domains.
+
+
+---
+
+Action
+
+Prendre en charge.
+
+
+---
+
+Effet
+
+escalated
+→ assigned_n2
+
+
+---
+
+Clôture
+
+Résolution
+
+assigned_n2
+→ closed_resolved
+
+Session collective
+
+Ajout d'un bloc Webex.
+
+Puis :
+
+assigned_n2
+→ closed_webex
+
+
+---
+
+10. CHAT TEMPS RÉEL
+
+Principes
+
+Conversation unique par ticket.
+
+Historique permanent.
+
+
+---
+
+Participants
+
+enseignant
+
+N1 ou N2
+
+
+
+---
+
+Contraintes
+
+Affichage type messagerie instantanée.
+
+Utilisation obligatoire :
+
+height:100dvh;
+
+
+---
+
+Zone de saisie
+
+position:sticky;
+bottom:0;
+
+
+---
+
+Socket.io
+
+Événements
+
+join-ticket
+
+leave-ticket
+
+new-message
+
+message-received
+
+typing-start
+
+typing-stop
+
+
+---
+
+11. TABLEAUX DE BORD RD
+
+Restriction
+
+Aucun accès :
+
+aux messages
+
+aux descriptions
+
+
+
+---
+
+KPI
+
+Volume
+
+Nombre total de tickets.
+
+Latence
+
+Temps moyen :
+
+création → prise en charge N1.
+
+Résolution
+
+N1 vs N2.
+
+Domaines
+
+Répartition des escalades.
+
+
+---
+
+12. TABLEAUX DE BORD PG
+
+Périmètre
+
+Tous les établissements.
+
+Filtrage discipline.
+
+
+---
+
+KPI
+
+Évolution mensuelle
+
+Tickets par mois.
+
+Classement établissements
+
+Colonnes :
+
+établissement
+
+tickets
+
+taux d'escalade
+
+délai moyen
+
+domaine dominant
+
+
+Top domaines
+
+Classement global.
+
+
+---
+
+13. SÉCURITÉ
+
+JWT
+
+Durée :
+
+Enseignant
+
+30 jours
+
+Utilisateurs
+
+8 heures
+
+Refresh token recommandé.
+
+
+---
+
+Rate limiting
+
+Protection :
+
+login ticket
+
+login utilisateur
+
+création ticket
+
+
+
+---
+
+Protection XSS
+
+Validation stricte des contenus.
+
+
+---
+
+Protection CSRF
+
+Selon mode de stockage JWT retenu.
+
+
+---
+
+Journalisation
+
+Logs :
+
+connexions
+
+erreurs
+
+escalades
+
+conflits de prise en charge
+
+
+
+---
+
+14. CONTRÔLE D'ACCÈS
+
+Anonymous Teacher
+
+Accès uniquement :
+
+à son ticket ;
+
+à son chat.
+
+
+
+---
+
+N1
+
+Accès :
+
+tickets de son établissement.
+
+
+
+---
+
+N2
+
+Accès :
+
+tickets correspondant à ses domaines.
+
+
+
+---
+
+RD
+
+Accès :
+
+statistiques agrégées uniquement.
+
+
+
+---
+
+PG
+
+Accès :
+
+statistiques agrégées uniquement.
+
+
+
+---
+
+Interdiction absolue
+
+Toute tentative RD ou PG :
+
+GET /messages/*
+GET /tickets/:id
+
+retourne :
+
+403 Forbidden
+
+
+---
+
+15. API REST
+
+Enseignant
+
+POST /api/tickets/create
+
+POST /api/tickets/login
+
+GET /api/tickets/my-chat
+
+POST /api/messages/send
+
+
+---
+
+N1
+
+GET /api/intervener/pool-n1
+
+PATCH /api/tickets/:id/claim
+
+PATCH /api/tickets/:id/escalate
+
+PATCH /api/tickets/:id/resolve-n1
+
+
+---
+
+N2
+
+GET /api/intervener/pool-n2
+
+PATCH /api/tickets/:id/claim
+
+PATCH /api/tickets/:id/resolve
+
+PATCH /api/tickets/:id/webex
+
+
+---
+
+RD
+
+GET /api/dashboard/rd
+
+
+---
+
+PG
+
+GET /api/dashboard/pg
+
+
+---
+
+16. PERFORMANCE
+
+Objectifs
+
+Temps API :
+
+< 300 ms
+
+
+---
+
+Temps affichage :
+
+< 2 secondes
+
+
+---
+
+Utilisateurs simultanés :
+
+500 minimum
+
+
+---
+
+17. INDEX SQL
+
+Obligatoires.
+
+CREATE INDEX idx_tickets_status
+ON tickets(status);
+
+CREATE INDEX idx_tickets_school
+ON tickets(school_id);
+
+CREATE INDEX idx_tickets_discipline
+ON tickets(discipline_id);
+
+CREATE INDEX idx_messages_ticket
+ON messages(ticket_id);
+
+CREATE INDEX idx_ticket_events_ticket
+ON ticket_events(ticket_id);
+
+CREATE INDEX idx_tickets_created_at
+ON tickets(created_at);
+
+
+---
+
+18. TESTS
+
+Backend
+
+Couverture minimale :
+
+80 %
+
+
+---
+
+Tests :
+
+unitaires
+
+intégration
+
+sécurité
+
+
+
+---
+
+Frontend
+
+Tests :
+
+composants
+
+parcours utilisateur
+
+
+
+---
+
+19. LIVRABLES
+
+Dépôt Git
+
+/frontend
+/backend
+/database
+/docs
+
+
+---
+
+Base SQL
+
+Script complet :
+
+création
+
+index
+
+contraintes
+
+données de référence
+
+
+
+---
+
+Documentation
+
+installation
+
+architecture
+
+API
+
+déploiement
+
+
+
+---
+
+Fichier .env.example
+
+Variables :
+
+JWT_SECRET
+
+JWT_REFRESH_SECRET
+
+DB_HOST
+
+DB_PORT
+
+DB_NAME
+
+DB_USER
+
+DB_PASSWORD
+
+SOCKET_PORT
+
+FRONTEND_URL
+
+
+
+---
+
+20. ÉVOLUTIONS FUTURES PRÉVUES
+
+Architecture devant permettre sans refonte :
+
+multi-réseaux d'établissements ;
+
+multi-disciplines simultanées ;
+
+export statistique CSV ;
+
+tableaux de bord avancés ;
+
+authentification SSO institutionnelle ;
+
+anonymisation réglementaire renforcée ;
+
+hébergement cloud haute disponibilité. :::
+
+
+Ce CDC est suffisamment détaillé pour servir de base à :
+
+1. une consultation de prestataires ;
+
+
+2. un appel d'offres ;
+
+
+3. la rédaction des User Stories ;
+
+
+4. la conception UML ;
+
+
+5. la génération de l'architecture NestJS/React/PostgreSQL complète.
+
+

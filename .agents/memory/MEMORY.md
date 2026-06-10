@@ -1,0 +1,2 @@
+- [Orval TanStack v5 queryKey](orval-querykey-workaround.md) — UseQueryOptions requires queryKey in v5; use `as any` on options object to pass refetchInterval/enabled without it.
+- [Kiosque JWT token shapes](kiosque-jwt.md) — two distinct JWT payload types; always run typecheck:libs before api-server typecheck after schema changes.

@@ -3,20 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Le Kiosque Pédagogique API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
+  - name: tickets
+  - name: messages
+  - name: intervener
+  - name: dashboard
+  - name: reference
+  - name: admin
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +30,851 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── AUTH ─────────────────────────────────────────────────────────────────
+  /auth/staff-login:
+    post:
+      operationId: staffLogin
+      tags: [auth]
+      summary: Login for staff users (N1, N2, RD, PG, admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StaffCredentials"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+        "401":
+          description: Invalid credentials
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current authenticated user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  # ── TICKETS ──────────────────────────────────────────────────────────────
+  /tickets/create:
+    post:
+      operationId: createTicket
+      tags: [tickets]
+      summary: Create a new anonymous ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketInput"
+      responses:
+        "201":
+          description: Ticket created with credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketCreated"
+
+  /tickets/login:
+    post:
+      operationId: loginTicket
+      tags: [tickets]
+      summary: Authenticate as an anonymous teacher using ticket number + password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TicketCredentials"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResult"
+        "401":
+          description: Invalid ticket credentials
+
+  /tickets/me:
+    get:
+      operationId: getMyTicket
+      tags: [tickets]
+      summary: Get the authenticated teacher's ticket
+      responses:
+        "200":
+          description: Ticket detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+        "401":
+          description: Unauthorized
+
+  /tickets/{id}:
+    get:
+      operationId: getTicket
+      tags: [tickets]
+      summary: Get a ticket by ID (staff only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ticket detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
+  /tickets/{id}/claim:
+    patch:
+      operationId: claimTicket
+      tags: [tickets]
+      summary: Claim a ticket (N1 or N2)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ticket updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+        "409":
+          description: Already claimed
+
+  /tickets/{id}/escalate:
+    patch:
+      operationId: escalateTicket
+      tags: [tickets]
+      summary: Escalate a ticket to N2 (N1 only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EscalateInput"
+      responses:
+        "200":
+          description: Ticket escalated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+
+  /tickets/{id}/resolve-n1:
+    patch:
+      operationId: resolveTicketN1
+      tags: [tickets]
+      summary: Resolve a ticket at level 1 (N1 only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ticket resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+
+  /tickets/{id}/resolve:
+    patch:
+      operationId: resolveTicket
+      tags: [tickets]
+      summary: Resolve a ticket at level 2 (N2 only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ticket resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+
+  /tickets/{id}/webex:
+    patch:
+      operationId: closeTicketWebex
+      tags: [tickets]
+      summary: Close a ticket with Webex session link (N2 only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebexInput"
+      responses:
+        "200":
+          description: Ticket closed with Webex
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketDetail"
+
+  # ── MESSAGES ─────────────────────────────────────────────────────────────
+  /messages:
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message in a ticket conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /messages/ticket/{ticketId}:
+    get:
+      operationId: getTicketMessages
+      tags: [messages]
+      summary: Get all messages for a ticket
+      parameters:
+        - name: ticketId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Messages list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+        "403":
+          description: Forbidden
+
+  # ── INTERVENER POOL ───────────────────────────────────────────────────────
+  /intervener/pool:
+    get:
+      operationId: getPool
+      tags: [intervener]
+      summary: Get the ticket pool for the current intervener (N1 or N2)
+      responses:
+        "200":
+          description: Tickets in pool
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketSummary"
+        "403":
+          description: Forbidden
+
+  /intervener/my-tickets:
+    get:
+      operationId: getMyAssignedTickets
+      tags: [intervener]
+      summary: Get tickets assigned to the current intervener
+      responses:
+        "200":
+          description: Assigned tickets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketSummary"
+
+  # ── DASHBOARDS ────────────────────────────────────────────────────────────
+  /dashboard/rd:
+    get:
+      operationId: getDashboardRd
+      tags: [dashboard]
+      summary: Get RD dashboard stats
+      responses:
+        "200":
+          description: RD dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RdDashboard"
+        "403":
+          description: Forbidden
+
+  /dashboard/pg:
+    get:
+      operationId: getDashboardPg
+      tags: [dashboard]
+      summary: Get PG dashboard stats (all schools)
+      parameters:
+        - name: disciplineId
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: PG dashboard
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PgDashboard"
+        "403":
+          description: Forbidden
+
+  # ── REFERENCE DATA ────────────────────────────────────────────────────────
+  /schools:
+    get:
+      operationId: listSchools
+      tags: [reference]
+      summary: List all active schools
+      responses:
+        "200":
+          description: Schools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/School"
+
+  /disciplines:
+    get:
+      operationId: listDisciplines
+      tags: [reference]
+      summary: List all active disciplines
+      responses:
+        "200":
+          description: Disciplines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Discipline"
+
+  /transversal-domains:
+    get:
+      operationId: listTransversalDomains
+      tags: [reference]
+      summary: List all transversal domains
+      responses:
+        "200":
+          description: Transversal domains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransversalDomain"
+
+  # ── ADMIN ─────────────────────────────────────────────────────────────────
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      summary: List all users (admin only)
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      operationId: createUser
+      tags: [admin]
+      summary: Create a new staff user (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInput"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /admin/users/{id}:
+    patch:
+      operationId: updateUser
+      tags: [admin]
+      summary: Update a user (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /admin/schools:
+    post:
+      operationId: createSchool
+      tags: [admin]
+      summary: Create a school (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SchoolInput"
+      responses:
+        "201":
+          description: School created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/School"
+
+  /admin/disciplines:
+    post:
+      operationId: createDiscipline
+      tags: [admin]
+      summary: Create a discipline (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DisciplineInput"
+      responses:
+        "201":
+          description: Discipline created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Discipline"
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
 
+    # ── AUTH ─────────────────────────────────────────────────────────────
+    StaffCredentials:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    AuthResult:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, email, role]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        role:
+          type: string
+        schoolId:
+          type: ["integer", "null"]
+        disciplineId:
+          type: ["integer", "null"]
+        active:
+          type: boolean
+        school:
+          $ref: "#/components/schemas/School"
+        discipline:
+          $ref: "#/components/schemas/Discipline"
+        domains:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransversalDomain"
+
+    UserInput:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+        schoolId:
+          type: ["integer", "null"]
+        disciplineId:
+          type: ["integer", "null"]
+        domainIds:
+          type: array
+          items:
+            type: integer
+
+    UserUpdate:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+        schoolId:
+          type: ["integer", "null"]
+        disciplineId:
+          type: ["integer", "null"]
+        domainIds:
+          type: array
+          items:
+            type: integer
+        active:
+          type: boolean
+
+    # ── TICKETS ──────────────────────────────────────────────────────────
+    TicketInput:
+      type: object
+      required: [schoolId, disciplineId, description]
+      properties:
+        schoolId:
+          type: integer
+        disciplineId:
+          type: integer
+        description:
+          type: string
+
+    TicketCredentials:
+      type: object
+      required: [ticketNumber, password]
+      properties:
+        ticketNumber:
+          type: integer
+        password:
+          type: string
+
+    TicketCreated:
+      type: object
+      required: [ticketNumber, password, token]
+      properties:
+        ticketNumber:
+          type: integer
+        password:
+          type: string
+        token:
+          type: string
+
+    TicketSummary:
+      type: object
+      required: [id, status, createdAt]
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        schoolId:
+          type: integer
+        disciplineId:
+          type: integer
+        transversalDomainId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        school:
+          $ref: "#/components/schemas/School"
+        discipline:
+          $ref: "#/components/schemas/Discipline"
+        transversalDomain:
+          $ref: "#/components/schemas/TransversalDomain"
+
+    TicketDetail:
+      type: object
+      required: [id, status, createdAt]
+      properties:
+        id:
+          type: integer
+        status:
+          type: string
+        schoolId:
+          type: integer
+        disciplineId:
+          type: integer
+        transversalDomainId:
+          type: ["integer", "null"]
+        description:
+          type: ["string", "null"]
+        webexLink:
+          type: ["string", "null"]
+        webexCreatedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        school:
+          $ref: "#/components/schemas/School"
+        discipline:
+          $ref: "#/components/schemas/Discipline"
+        transversalDomain:
+          $ref: "#/components/schemas/TransversalDomain"
+
+    EscalateInput:
+      type: object
+      required: [transversalDomainId]
+      properties:
+        transversalDomainId:
+          type: integer
+
+    WebexInput:
+      type: object
+      required: [webexLink]
+      properties:
+        webexLink:
+          type: string
+
+    # ── MESSAGES ─────────────────────────────────────────────────────────
+    Message:
+      type: object
+      required: [id, ticketId, content, messageType, createdAt]
+      properties:
+        id:
+          type: integer
+        ticketId:
+          type: integer
+        senderId:
+          type: ["integer", "null"]
+        senderType:
+          type: string
+        content:
+          type: string
+        messageType:
+          type: string
+        createdAt:
+          type: string
+
+    MessageInput:
+      type: object
+      required: [ticketId, content]
+      properties:
+        ticketId:
+          type: integer
+        content:
+          type: string
+
+    # ── DASHBOARD ─────────────────────────────────────────────────────────
+    RdDashboard:
+      type: object
+      required: [totalTickets, avgPickupMinutes, resolutionByLevel, escalationsByDomain]
+      properties:
+        totalTickets:
+          type: integer
+        openTickets:
+          type: integer
+        avgPickupMinutes:
+          type: ["number", "null"]
+        resolutionByLevel:
+          $ref: "#/components/schemas/ResolutionStats"
+        escalationsByDomain:
+          type: array
+          items:
+            $ref: "#/components/schemas/DomainCount"
+        ticketsByStatus:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusCount"
+
+    PgDashboard:
+      type: object
+      required: [totalTickets, monthlyTrend, schoolRankings, topDomains]
+      properties:
+        totalTickets:
+          type: integer
+        monthlyTrend:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyCount"
+        schoolRankings:
+          type: array
+          items:
+            $ref: "#/components/schemas/SchoolRanking"
+        topDomains:
+          type: array
+          items:
+            $ref: "#/components/schemas/DomainCount"
+
+    ResolutionStats:
+      type: object
+      properties:
+        n1:
+          type: integer
+        n2:
+          type: integer
+        webex:
+          type: integer
+
+    DomainCount:
+      type: object
+      required: [domain, count]
+      properties:
+        domain:
+          type: string
+        count:
+          type: integer
+
+    StatusCount:
+      type: object
+      required: [status, count]
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+
+    MonthlyCount:
+      type: object
+      required: [month, count]
+      properties:
+        month:
+          type: string
+        count:
+          type: integer
+
+    SchoolRanking:
+      type: object
+      required: [schoolId, schoolName, totalTickets, escalationRate, avgMinutes]
+      properties:
+        schoolId:
+          type: integer
+        schoolName:
+          type: string
+        totalTickets:
+          type: integer
+        escalationRate:
+          type: number
+        avgMinutes:
+          type: ["number", "null"]
+        dominantDomain:
+          type: ["string", "null"]
+
+    # ── REFERENCE ─────────────────────────────────────────────────────────
+    School:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        city:
+          type: ["string", "null"]
+        active:
+          type: boolean
+
+    SchoolInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        city:
+          type: string
+
+    Discipline:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        active:
+          type: boolean
+
+    DisciplineInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    TransversalDomain:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
