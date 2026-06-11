@@ -49,7 +49,7 @@ export default function Connexion() {
       <div className="flex items-center justify-center min-h-[70vh]">
         <Card className="w-full max-w-md shadow-sm border-2">
           <CardHeader className="space-y-2 text-center pb-6">
-            <CardTitle className="text-2xl">Espace Agent</CardTitle>
+            <CardTitle className="text-2xl">Espace Personnes Ressources</CardTitle>
             <CardDescription>
               Connectez-vous pour accéder au tableau de bord.
             </CardDescription>

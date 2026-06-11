@@ -11,7 +11,7 @@ export function Navbar() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg text-primary tracking-tight">
-            <BookOpen className="h-6 w-6" />
+            <BookOpen className="h-6 w-6 shrink-0" />
             <span>Le Kiosque Pédagogique</span>
           </Link>
         </div>
@@ -29,7 +29,7 @@ export function Navbar() {
             </>
           ) : (
             <Link href="/connexion">
-              <Button variant="ghost" size="sm">Espace Agent</Button>
+              <Button variant="ghost" size="sm">Espace Personnes Ressources</Button>
             </Link>
           )}
         </div>

@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MessageSquarePlus, KeyRound, ShieldCheck } from "lucide-react";
+import { MessageSquarePlus, KeyRound, HeartHandshake } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 export default function Home() {
@@ -31,14 +31,14 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-[70vh] max-w-3xl mx-auto text-center space-y-12">
         <div className="space-y-6">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-            <ShieldCheck className="h-10 w-10 text-primary" />
+            <HeartHandshake className="h-10 w-10 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Soutien pédagogique confidentiel
+            Soutien pédagogique pour le pilote de la réforme du cycle d'orientation
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Un espace d'écoute et d'accompagnement dédié aux enseignants. 
-            Posez vos questions en toute sérénité, nos experts vous répondent de manière anonyme.
+            Un espace d'écoute et d'accompagnement dédié aux enseignantes et enseignants qui mettent en oeuvre les leviers pédagogiques du pilote de la réforme du CO. 
+            Posez vos questions en toute sérénité et de manière anonymes, nos experts pédagogiques vous répondent.
           </p>
         </div>
 
