@@ -120,7 +120,7 @@ export default function TableauPg() {
                         <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Établissement</th>
                         <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Demandes</th>
                         <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de résolution</th>
-                        <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée</th>
+                        <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée F3</th>
                         <th className="text-right py-2 font-medium text-muted-foreground">Délai moy.</th>
                       </tr>
                     </thead>
