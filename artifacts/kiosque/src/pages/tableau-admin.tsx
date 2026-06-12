@@ -4,9 +4,10 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useGetDashboardPg, useGetDashboardRd, useListDisciplines, useListSchools } from "@workspace/api-client-react";
+import { useGetDashboardPg, useGetDashboardRd, useListDisciplines, useListRdTickets, useListSchools } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
 import { AlertTriangle, BarChart3, Building2, Clock, Ticket, TrendingUp, Trophy } from "lucide-react";
+import { TicketsBrowseSection } from "@/components/tickets/TicketsBrowseSection";
 import { formatDelayDays, formatPercent } from "@/lib/format";
 
 function buildFilterLabel(schoolName?: string, disciplineName?: string): string {
@@ -22,14 +23,19 @@ export default function TableauAdmin() {
   const payload = token ? decodeToken(token) : null;
   const [disciplineFilter, setDisciplineFilter] = useState<string>("all");
   const [schoolFilter, setSchoolFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     if (!token || !payload || payload.role !== "admin") setLocation("/admin/connexion");
   }, []);
 
-  const filterParams = {
+  const scopeParams = {
     ...(disciplineFilter !== "all" ? { disciplineId: Number(disciplineFilter) } : {}),
     ...(schoolFilter !== "all" ? { schoolId: Number(schoolFilter) } : {}),
+  };
+  const ticketListParams = {
+    ...scopeParams,
+    ...(statusFilter !== "all" ? { status: statusFilter } : {}),
   };
   const hasFilters = disciplineFilter !== "all" || schoolFilter !== "all";
 
@@ -38,10 +44,13 @@ export default function TableauAdmin() {
   const selectedDiscipline = disciplines?.find((d) => d.id.toString() === disciplineFilter);
   const selectedSchool = schools?.find((s) => s.id.toString() === schoolFilter);
 
-  const { data: rd, isLoading: rdLoading, isError: rdError } = useGetDashboardRd(hasFilters ? filterParams : undefined, {
+  const { data: rd, isLoading: rdLoading, isError: rdError } = useGetDashboardRd(hasFilters ? scopeParams : undefined, {
     query: { enabled: !!token, refetchInterval: 60000 } as any,
   });
-  const { data: pg, isLoading: pgLoading, isError: pgError } = useGetDashboardPg(hasFilters ? filterParams : undefined, {
+  const { data: pg, isLoading: pgLoading, isError: pgError } = useGetDashboardPg(hasFilters ? scopeParams : undefined, {
+    query: { enabled: !!token, refetchInterval: 60000 } as any,
+  });
+  const { data: tickets, isLoading: ticketsLoading } = useListRdTickets(ticketListParams, {
     query: { enabled: !!token, refetchInterval: 60000 } as any,
   });
 
@@ -321,6 +330,22 @@ export default function TableauAdmin() {
             )}
           </>
         )}
+
+        <Card className="border">
+          <CardContent className="pt-6">
+            <TicketsBrowseSection
+              title="Demandes"
+              description="Descriptions anonymes. Les filtres en haut de page s'appliquent aussi à cette liste."
+              statusFilter={statusFilter}
+              onStatusFilterChange={setStatusFilter}
+              tickets={tickets}
+              ticketsLoading={ticketsLoading}
+              showSchool
+              showDiscipline
+              emptyMessage="Aucune demande ne correspond aux filtres sélectionnés."
+            />
+          </CardContent>
+        </Card>
       </div>
     </AppLayout>
   );

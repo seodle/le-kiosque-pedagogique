@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMyTicket, useGetTicketMessages } from "@workspace/api-client-react";
@@ -11,23 +11,9 @@ import { useSendTicketMessage } from "@/hooks/use-send-ticket-message";
 import { getToken, decodeToken } from "@/lib/auth";
 import { Send, MessageSquare, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import { VisioNotice } from "@/components/tickets/VisioNotice";
 import { ChatMessage } from "@/components/tickets/ChatMessage";
 import { isChatClosed } from "@/lib/ticket-status";
-
-function statusLabel(status: string) {
-  switch (status) {
-    case "new": return { label: "En attente", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" };
-    case "claimed_n1": return { label: "Pris en charge", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" };
-    case "escalated": return { label: "Remontée", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" };
-    case "claimed_n2": return { label: "En cours N2", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" };
-    case "resolved_n1": return { label: "Résolu", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
-    case "resolved_n2": return { label: "Résolu", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
-    case "closed_webex": return { label: "Visio programmée", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" };
-    default: return { label: status, color: "bg-muted text-muted-foreground" };
-  }
-}
 
 export default function MonTicket() {
   const [, setLocation] = useLocation();
@@ -68,7 +54,6 @@ export default function MonTicket() {
 
   if (!ticketId) return null;
 
-  const { label, color } = ticket ? statusLabel(ticket.status) : { label: "", color: "" };
   const isVisioScheduled = ticket?.status === "closed_webex";
   const isFullyClosed = ticket && isChatClosed(ticket.status);
   const chatClosed = ticket ? isChatClosed(ticket.status) : true;
@@ -82,9 +67,9 @@ export default function MonTicket() {
             {ticket && <p className="text-muted-foreground text-sm mt-1">Demande n° {ticket.id} · {ticket.school?.name} · {ticket.discipline?.name}</p>}
           </div>
           {ticket && (
-            <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium", color)}>
-              {isFullyClosed ? <CheckCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
-              {label}
+            <span className="inline-flex items-center gap-1.5">
+              {isFullyClosed ? <CheckCircle className="h-3.5 w-3.5 text-muted-foreground" /> : <Clock className="h-3.5 w-3.5 text-muted-foreground" />}
+              <StatusBadge status={ticket.status} className="text-sm" />
             </span>
           )}
         </div>

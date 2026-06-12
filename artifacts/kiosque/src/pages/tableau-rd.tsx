@@ -3,12 +3,11 @@ import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ApiError, useGetDashboardRd, useListRdTickets } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
-import { BarChart3, Clock, Ticket, TrendingUp, AlertTriangle, BookOpen, Building2, MessageSquareText, Trophy } from "lucide-react";
-import { getTicketStatusLabel, TICKET_STATUS_LABELS } from "@/lib/ticket-status";
-import { TicketBrowseCard } from "@/components/tickets/TicketBrowseCard";
+import { BarChart3, Clock, Ticket, TrendingUp, AlertTriangle, BookOpen, Building2, Trophy } from "lucide-react";
+import { TicketsBrowseSection } from "@/components/tickets/TicketsBrowseSection";
+import { getTicketStatusLabel } from "@/lib/ticket-status";
 import { formatDelayDays, formatPercent } from "@/lib/format";
 
 function ticketsLoadErrorMessage(error: unknown): string {
@@ -21,76 +20,6 @@ function ticketsLoadErrorMessage(error: unknown): string {
     }
   }
   return "Impossible de charger les demandes. Vérifiez que l'API est démarrée, puis réessayez.";
-}
-
-function TicketsBrowseSection({
-  isRd,
-  statusFilter,
-  onStatusFilterChange,
-  tickets,
-  ticketsLoading,
-  ticketsErrorMessage,
-}: {
-  isRd: boolean;
-  statusFilter: string;
-  onStatusFilterChange: (value: string) => void;
-  tickets?: { id: number }[];
-  ticketsLoading: boolean;
-  ticketsErrorMessage?: string;
-}) {
-  return (
-    <section className="space-y-4">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <MessageSquareText className="h-5 w-5 text-primary" />
-          <div>
-            <h2 className="text-lg font-semibold">Parcourir les demandes</h2>
-            <p className="text-sm text-muted-foreground">
-              {isRd
-                ? "Questions posées par les enseignants de votre établissement et de votre discipline — utiles pour préparer vos échanges avec la présidence de groupe."
-                : "Questions posées dans votre établissement, toutes disciplines confondues."}
-            </p>
-          </div>
-        </div>
-        <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Statut…" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les statuts</SelectItem>
-            {Object.keys(TICKET_STATUS_LABELS).map((status) => (
-              <SelectItem key={status} value={status}>{getTicketStatusLabel(status)}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {ticketsErrorMessage && (
-        <p className="text-sm text-destructive border border-destructive/30 rounded-lg px-4 py-3">
-          {ticketsErrorMessage}
-        </p>
-      )}
-
-      {ticketsLoading && <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-28" />)}</div>}
-
-      {!ticketsLoading && !ticketsErrorMessage && tickets?.length === 0 && (
-        <p className="text-sm text-muted-foreground text-center py-8 border rounded-lg">
-          Aucune demande pour le moment dans votre périmètre.
-        </p>
-      )}
-
-      <div className="space-y-3">
-        {tickets?.map((t) => (
-          <TicketBrowseCard
-            key={t.id}
-            ticket={t as Parameters<typeof TicketBrowseCard>[0]["ticket"]}
-            showSchool={!isRd}
-            showDiscipline={!isRd}
-          />
-        ))}
-      </div>
-    </section>
-  );
 }
 
 export default function TableauRd() {
@@ -194,12 +123,14 @@ export default function TableauRd() {
 
         {canBrowseTickets && (
           <TicketsBrowseSection
-            isRd={isRd}
+            description="Questions posées par les enseignants de votre établissement et de votre discipline — utiles pour préparer vos échanges avec la présidence de groupe."
             statusFilter={statusFilter}
             onStatusFilterChange={setStatusFilter}
             tickets={tickets}
             ticketsLoading={ticketsLoading}
             ticketsErrorMessage={ticketsErrorMessage}
+            showSchool={false}
+            showDiscipline={false}
           />
         )}
 
