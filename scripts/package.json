@@ -5,9 +5,22 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "migrate:username": "tsx ./src/migrate-username.ts",
+    "migrate:roles": "tsx ./src/migrate-roles.ts",
+    "seed": "tsx ./src/seed.ts",
+    "seed:demo": "tsx ./src/seed.ts --demo",
+    "seed:mock": "tsx ./src/seed-mock.ts",
+    "seed:mock:reset": "tsx ./src/seed-mock.ts --reset",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@workspace/db": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "catalog:"
+  },
   "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
     "@types/node": "catalog:",
     "tsx": "catalog:"
   }
