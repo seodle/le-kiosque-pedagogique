@@ -49,6 +49,9 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# Local demo credentials (do not commit)
+mock-demo-identifiants.docx
+
 # Replit
 .cache/
 .local/
