@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetMyTicket, useGetTicketMessages, useSendMessage } from "@workspace/api-client-react";
+import { useGetMyTicket, useGetTicketMessages } from "@workspace/api-client-react";
+import { useSendTicketMessage } from "@/hooks/use-send-ticket-message";
 import { getToken, decodeToken } from "@/lib/auth";
 import { Send, MessageSquare, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -49,9 +50,9 @@ export default function MonTicket() {
   });
   const { data: messagesData, isLoading: messagesLoading } = useGetTicketMessages(
     ticketId!,
-    { query: { enabled: !!ticketId, refetchInterval: 5000 } as any }
+    { query: { enabled: !!ticketId, refetchInterval: 3000 } as any }
   );
-  const { mutate: sendMessage, isPending: sending } = useSendMessage();
+  const { send, isPending: sending } = useSendTicketMessage(ticketId!);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -59,13 +60,10 @@ export default function MonTicket() {
 
   function handleSend() {
     if (!message.trim() || !ticketId) return;
-    sendMessage(
-      { data: { ticketId, content: message.trim() } },
-      {
-        onSuccess: () => setMessage(""),
-        onError: () => toast({ title: "Erreur", description: "Impossible d'envoyer le message.", variant: "destructive" }),
-      }
-    );
+    send(message, {
+      onSuccess: () => setMessage(""),
+      onError: () => toast({ title: "Erreur", description: "Impossible d'envoyer le message.", variant: "destructive" }),
+    });
   }
 
   if (!ticketId) return null;

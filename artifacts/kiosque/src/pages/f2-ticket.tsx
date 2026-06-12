@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
-  useGetTicket, useGetTicketMessages, useSendMessage,
+  useGetTicket, useGetTicketMessages,
   useClaimTicket, useResolveTicketN1, useEscalateTicket
 } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
@@ -20,6 +20,7 @@ import { VisioNotice } from "@/components/tickets/VisioNotice";
 import { ChatMessage } from "@/components/tickets/ChatMessage";
 import { ReassignTicketDialog } from "@/components/tickets/ReassignTicketDialog";
 import { isChatClosed } from "@/lib/ticket-status";
+import { useSendTicketMessage } from "@/hooks/use-send-ticket-message";
 
 function statusLabel(status: string) {
   const map: Record<string, { label: string; color: string }> = {
@@ -56,12 +57,12 @@ export default function F2Ticket() {
   );
   const { data: messages, isLoading: messagesLoading } = useGetTicketMessages(
     ticketId,
-    { query: { enabled: !!ticketId, refetchInterval: 5000 } as any }
+    { query: { enabled: !!ticketId, refetchInterval: 3000 } as any }
   );
   const { mutate: claimTicket, isPending: claiming } = useClaimTicket();
   const { mutate: resolveN1, isPending: resolving } = useResolveTicketN1();
   const { mutate: escalate, isPending: escalating } = useEscalateTicket();
-  const { mutate: sendMessage, isPending: sending } = useSendMessage();
+  const { send, isPending: sending } = useSendTicketMessage(ticketId);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -105,7 +106,7 @@ export default function F2Ticket() {
 
   function handleSend() {
     if (!message.trim()) return;
-    sendMessage({ data: { ticketId, content: message.trim() } }, {
+    send(message, {
       onSuccess: () => setMessage(""),
       onError: () => toast({ title: "Erreur d'envoi", variant: "destructive" }),
     });
