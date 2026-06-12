@@ -1,4 +1,5 @@
-import { Link } from "wouter";
+import { useEffect } from "react";
+import { Link, useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { usernameSchema } from "@/lib/username";
@@ -21,8 +22,16 @@ const formSchema = z.object({
 });
 
 export default function AdminConnexion() {
-  const { login } = useAuth();
+  const [, setLocation] = useLocation();
+  const { role, login } = useAuth();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (role && isOversightRole(role)) {
+      const redirect = dashboardPathForRole(role);
+      if (redirect) setLocation(redirect);
+    }
+  }, [role, setLocation]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
