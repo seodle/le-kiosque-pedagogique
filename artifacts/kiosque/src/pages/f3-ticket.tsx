@@ -18,6 +18,11 @@ import { Send, ArrowLeft, CheckCircle, Video, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { VisioNotice } from "@/components/tickets/VisioNotice";
+import {
+  VisioScheduleFields,
+  combineVisioSchedule,
+  defaultVisioDate,
+} from "@/components/tickets/VisioScheduleFields";
 import { ChatMessage } from "@/components/tickets/ChatMessage";
 import { ReassignTicketDialog } from "@/components/tickets/ReassignTicketDialog";
 import { isChatClosed } from "@/lib/ticket-status";
@@ -41,7 +46,8 @@ export default function F3Ticket() {
   const queryClient = useQueryClient();
   const [message, setMessage] = useState("");
   const [webexLink, setWebexLink] = useState("");
-  const [visioScheduledAt, setVisioScheduledAt] = useState("");
+  const [visioDate, setVisioDate] = useState("");
+  const [visioTime, setVisioTime] = useState("10:00");
   const [webexOpen, setWebexOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -89,10 +95,18 @@ export default function F3Ticket() {
     });
   }
 
+  function openWebexDialog(open: boolean) {
+    setWebexOpen(open);
+    if (open && !visioDate) {
+      setVisioDate(defaultVisioDate());
+      setVisioTime("10:00");
+    }
+  }
+
   function handleCloseWebex() {
-    if (!webexLink.trim() || !visioScheduledAt) return;
-    const scheduledAt = new Date(visioScheduledAt);
-    if (Number.isNaN(scheduledAt.getTime())) {
+    if (!webexLink.trim() || !visioDate || !visioTime) return;
+    const scheduledAt = combineVisioSchedule(visioDate, visioTime);
+    if (!scheduledAt) {
       toast({ title: "Date invalide", variant: "destructive" });
       return;
     }
@@ -192,7 +206,7 @@ export default function F3Ticket() {
                   {resolving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
                   Résoudre
                 </Button>
-                <Dialog open={webexOpen} onOpenChange={setWebexOpen}>
+                <Dialog open={webexOpen} onOpenChange={openWebexDialog}>
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <Video className="h-4 w-4" />
@@ -207,15 +221,12 @@ export default function F3Ticket() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="visio-date">Date et heure de la session</Label>
-                        <Input
-                          id="visio-date"
-                          type="datetime-local"
-                          value={visioScheduledAt}
-                          onChange={(e) => setVisioScheduledAt(e.target.value)}
-                        />
-                      </div>
+                      <VisioScheduleFields
+                        date={visioDate}
+                        time={visioTime}
+                        onDateChange={setVisioDate}
+                        onTimeChange={setVisioTime}
+                      />
                       <div className="space-y-2">
                         <Label htmlFor="visio-link">Lien visio</Label>
                         <Input
@@ -228,7 +239,7 @@ export default function F3Ticket() {
                     </div>
                     <DialogFooter>
                       <Button variant="outline" onClick={() => setWebexOpen(false)}>Annuler</Button>
-                      <Button onClick={handleCloseWebex} disabled={closingWebex || !webexLink.trim() || !visioScheduledAt}>
+                      <Button onClick={handleCloseWebex} disabled={closingWebex || !webexLink.trim() || !visioDate || !visioTime}>
                         {closingWebex ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                         Valider
                       </Button>
