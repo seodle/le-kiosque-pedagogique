@@ -8,19 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetMyTicket, useGetTicketMessages, useSendMessage } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
-import { Send, MessageSquare, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { Send, MessageSquare, Clock, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { VisioNotice } from "@/components/tickets/VisioNotice";
+import { ChatMessage } from "@/components/tickets/ChatMessage";
+import { isChatClosed } from "@/lib/ticket-status";
 
 function statusLabel(status: string) {
   switch (status) {
     case "new": return { label: "En attente", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" };
     case "claimed_n1": return { label: "Pris en charge", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" };
-    case "escalated": return { label: "Escaladé", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" };
+    case "escalated": return { label: "Remontée", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" };
     case "claimed_n2": return { label: "En cours N2", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" };
     case "resolved_n1": return { label: "Résolu", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
     case "resolved_n2": return { label: "Résolu", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
-    case "closed_webex": return { label: "Clôturé (Webex)", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" };
+    case "closed_webex": return { label: "Visio programmée", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" };
     default: return { label: status, color: "bg-muted text-muted-foreground" };
   }
 }
@@ -68,19 +71,21 @@ export default function MonTicket() {
   if (!ticketId) return null;
 
   const { label, color } = ticket ? statusLabel(ticket.status) : { label: "", color: "" };
-  const isResolved = ticket && ["resolved_n1", "resolved_n2", "closed_webex"].includes(ticket.status);
+  const isVisioScheduled = ticket?.status === "closed_webex";
+  const isFullyClosed = ticket && isChatClosed(ticket.status);
+  const chatClosed = ticket ? isChatClosed(ticket.status) : true;
 
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto py-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Mon ticket</h1>
-            {ticket && <p className="text-muted-foreground text-sm mt-1">#{ticket.id} · {ticket.school?.name} · {ticket.discipline?.name}</p>}
+            <h1 className="text-2xl font-bold">Ma demande</h1>
+            {ticket && <p className="text-muted-foreground text-sm mt-1">Demande n° {ticket.id} · {ticket.school?.name} · {ticket.discipline?.name}</p>}
           </div>
           {ticket && (
             <span className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium", color)}>
-              {isResolved ? <CheckCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+              {isFullyClosed ? <CheckCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
               {label}
             </span>
           )}
@@ -100,16 +105,7 @@ export default function MonTicket() {
         )}
 
         {ticket?.webexLink && (
-          <Card className="border-2 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20">
-            <CardContent className="pt-4 pb-4 flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-600 shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Réunion Webex programmée</p>
-                <a href={ticket.webexLink} target="_blank" rel="noopener noreferrer"
-                  className="text-sm text-blue-600 underline break-all">{ticket.webexLink}</a>
-              </div>
-            </CardContent>
-          </Card>
+          <VisioNotice link={ticket.webexLink} scheduledAt={ticket.webexScheduledAt} />
         )}
 
         <Card className="border-2">
@@ -118,6 +114,11 @@ export default function MonTicket() {
               <MessageSquare className="h-4 w-4" />
               Échanges
             </CardTitle>
+            {isVisioScheduled && (
+              <p className="text-sm text-muted-foreground font-normal">
+                Vous pouvez continuer à échanger jusqu&apos;à la session visio.
+              </p>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -128,25 +129,20 @@ export default function MonTicket() {
                 </p>
               )}
               {messagesData?.map((msg) => (
-                <div
+                <ChatMessage
                   key={msg.id}
-                  className={cn(
-                    "rounded-lg px-4 py-3 max-w-[85%]",
-                    msg.senderType === "teacher"
-                      ? "ml-auto bg-primary text-primary-foreground"
-                      : "mr-auto bg-muted"
-                  )}
-                >
-                  <p className="text-sm leading-relaxed">{msg.content}</p>
-                  <p className={cn("text-xs mt-1.5", msg.senderType === "teacher" ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                    {new Date(msg.createdAt).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                </div>
+                  content={msg.content}
+                  createdAt={msg.createdAt}
+                  senderType={msg.senderType}
+                  messageType={msg.messageType}
+                  staffLabel="Personne ressource"
+                  perspective="teacher"
+                />
               ))}
               <div ref={messagesEndRef} />
             </div>
 
-            {!isResolved && (
+            {!chatClosed && (
               <div className="flex gap-2 pt-2 border-t">
                 <Textarea
                   placeholder="Votre message…"
@@ -164,9 +160,9 @@ export default function MonTicket() {
                 </Button>
               </div>
             )}
-            {isResolved && (
+            {chatClosed && (
               <p className="text-sm text-center text-muted-foreground pt-2 border-t">
-                Ce ticket est clôturé. Merci d'avoir utilisé le Kiosque Pédagogique.
+                Cette demande est clôturée. Merci d&apos;avoir utilisé le Kiosque Pédagogique.
               </p>
             )}
           </CardContent>

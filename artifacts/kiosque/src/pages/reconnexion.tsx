@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useLoginTicket } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
 import { AppLayout } from "@/components/layout/AppLayout";
@@ -13,7 +14,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  ticketNumber: z.coerce.number().min(1, "Numéro de ticket invalide"),
+  ticketNumber: z.coerce.number().min(1, "Numéro de demande invalide"),
   password: z.string().min(1, "Mot de passe requis"),
 });
 
@@ -37,7 +38,7 @@ export default function Reconnexion() {
       onError: () => {
         toast({
           title: "Accès refusé",
-          description: "Numéro de ticket ou mot de passe incorrect.",
+          description: "Numéro de demande ou mot de passe incorrect.",
           variant: "destructive"
         });
       }
@@ -51,7 +52,7 @@ export default function Reconnexion() {
           <CardHeader className="space-y-2 text-center pb-6">
             <CardTitle className="text-2xl">Suivre une demande</CardTitle>
             <CardDescription>
-              Saisissez les identifiants qui vous ont été fournis lors de la création de votre ticket.
+              Saisissez les identifiants qui vous ont été fournis lors de la création de votre demande.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -62,7 +63,7 @@ export default function Reconnexion() {
                   name="ticketNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Numéro de ticket</FormLabel>
+                      <FormLabel>Numéro de demande</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="Ex: 84" {...field} />
                       </FormControl>
@@ -77,7 +78,7 @@ export default function Reconnexion() {
                     <FormItem>
                       <FormLabel>Mot de passe</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: ROBOT-84-VERT" {...field} />
+                        <PasswordInput placeholder="Ex: ROBOT-84-VERT" autoComplete="current-password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -85,7 +86,7 @@ export default function Reconnexion() {
                 />
                 <Button type="submit" className="w-full" disabled={isPending}>
                   {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Accéder à mon ticket
+                  Accéder à ma demande
                 </Button>
               </form>
             </Form>

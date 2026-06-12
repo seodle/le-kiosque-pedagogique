@@ -51,7 +51,7 @@ export default function Credentials() {
           <div className="inline-flex items-center justify-center p-3 bg-green-100 dark:bg-green-900/30 rounded-full">
             <KeyRound className="h-8 w-8 text-green-600 dark:text-green-400" />
           </div>
-          <h1 className="text-2xl font-bold">Votre ticket a été créé !</h1>
+          <h1 className="text-2xl font-bold">Votre demande a été créée !</h1>
           <p className="text-muted-foreground">
             Notez soigneusement ces identifiants — ils sont <strong>la seule façon</strong> d'accéder à votre demande.
           </p>
@@ -73,7 +73,7 @@ export default function Credentials() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Numéro de ticket</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Numéro de demande</p>
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="text-2xl font-mono px-4 py-2">
                   {credentials.ticketNumber}
@@ -112,7 +112,7 @@ export default function Credentials() {
 
         <Link href="/mon-ticket">
           <Button className="w-full gap-2" size="lg">
-            Accéder à mon ticket
+            Accéder à ma demande
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { dashboardPathForRole } from "@/lib/roles";
 
 const TOKEN_KEY = "kiosque_token";
 
@@ -49,14 +50,7 @@ export function useAuth() {
     if (redirectPath) {
       setLocation(redirectPath);
     } else {
-      switch (newRole) {
-        case "n1": setLocation("/n1"); break;
-        case "n2": setLocation("/n2"); break;
-        case "rd": setLocation("/tableau-rd"); break;
-        case "pg": setLocation("/tableau-pg"); break;
-        case "admin": setLocation("/admin"); break;
-        default: setLocation("/mon-ticket"); break;
-      }
+      setLocation(dashboardPathForRole(newRole!) ?? "/mon-ticket");
     }
   };
 

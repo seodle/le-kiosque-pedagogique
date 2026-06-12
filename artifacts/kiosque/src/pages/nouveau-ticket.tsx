@@ -46,7 +46,7 @@ export default function NouveauTicket() {
       onError: () => {
         toast({
           title: "Erreur",
-          description: "Impossible de créer le ticket. Réessayez.",
+          description: "Impossible de créer la demande. Réessayez.",
           variant: "destructive",
         });
       }
@@ -71,7 +71,7 @@ export default function NouveauTicket() {
             <CardTitle>Décrivez votre situation</CardTitle>
             <CardDescription>
               Aucune information permettant de vous identifier ne sera collectée.
-              Un numéro de ticket et un mot de passe vous seront remis à la fin.
+              Un numéro de demande et un mot de passe vous seront remis à la fin.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -1,19 +1,22 @@
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { usernameSchema } from "@/lib/username";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useStaffLogin } from "@workspace/api-client-react";
-import { useAuth } from "@/lib/auth";
+import { decodeToken, useAuth } from "@/lib/auth";
+import { isOversightRole } from "@/lib/roles";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  email: z.string().email("Email invalide"),
+  username: usernameSchema,
   password: z.string().min(1, "Mot de passe requis"),
 });
 
@@ -24,7 +27,7 @@ export default function Connexion() {
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { username: "", password: "" },
   });
 
   const { mutate: doLogin, isPending } = useStaffLogin();
@@ -32,6 +35,15 @@ export default function Connexion() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     doLogin({ data: values }, {
       onSuccess: (data) => {
+        const payload = decodeToken(data.token);
+        if (payload?.role && isOversightRole(payload.role)) {
+          toast({
+            title: "Espace dédié",
+            description: "RD, PG, direction et admin se connectent via l'espace administration.",
+            variant: "destructive",
+          });
+          return;
+        }
         login(data.token);
       },
       onError: () => {
@@ -51,7 +63,7 @@ export default function Connexion() {
           <CardHeader className="space-y-2 text-center pb-6">
             <CardTitle className="text-2xl">Espace Personnes Ressources</CardTitle>
             <CardDescription>
-              Connectez-vous pour accéder au tableau de bord.
+              Connexion réservée aux personnes ressources F2 et F3.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -59,12 +71,12 @@ export default function Connexion() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
-                  name="email"
+                  name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email professionnel</FormLabel>
+                      <FormLabel>Pseudo</FormLabel>
                       <FormControl>
-                        <Input placeholder="prenom.nom@academie.fr" {...field} />
+                        <Input autoComplete="username" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -77,7 +89,7 @@ export default function Connexion() {
                     <FormItem>
                       <FormLabel>Mot de passe</FormLabel>
                       <FormControl>
-                        <Input type="password" {...field} />
+                        <PasswordInput autoComplete="current-password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -89,6 +101,11 @@ export default function Connexion() {
                 </Button>
               </form>
             </Form>
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              <Link href="/admin/connexion" className="underline hover:text-foreground">
+                Administration, RD, PG ou direction
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>

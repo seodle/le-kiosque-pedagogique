@@ -10,13 +10,15 @@ import Reconnexion from "@/pages/reconnexion";
 import NouveauTicket from "@/pages/nouveau-ticket";
 import Credentials from "@/pages/credentials";
 import MonTicket from "@/pages/mon-ticket";
-import N1 from "@/pages/n1";
-import N1Ticket from "@/pages/n1-ticket";
-import N2 from "@/pages/n2";
-import N2Ticket from "@/pages/n2-ticket";
+import F2 from "@/pages/f2";
+import F2Ticket from "@/pages/f2-ticket";
+import F3 from "@/pages/f3";
+import F3Ticket from "@/pages/f3-ticket";
 import TableauRd from "@/pages/tableau-rd";
 import TableauPg from "@/pages/tableau-pg";
+import TableauAdmin from "@/pages/tableau-admin";
 import Admin from "@/pages/admin";
+import AdminConnexion from "@/pages/admin-connexion";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,12 +38,14 @@ function Router() {
       <Route path="/nouveau-ticket" component={NouveauTicket} />
       <Route path="/credentials" component={Credentials} />
       <Route path="/mon-ticket" component={MonTicket} />
-      <Route path="/n1" component={N1} />
-      <Route path="/n1/ticket/:id" component={N1Ticket} />
-      <Route path="/n2" component={N2} />
-      <Route path="/n2/ticket/:id" component={N2Ticket} />
+      <Route path="/f2" component={F2} />
+      <Route path="/f2/ticket/:id" component={F2Ticket} />
+      <Route path="/f3" component={F3} />
+      <Route path="/f3/ticket/:id" component={F3Ticket} />
       <Route path="/tableau-rd" component={TableauRd} />
       <Route path="/tableau-pg" component={TableauPg} />
+      <Route path="/tableau-admin" component={TableauAdmin} />
+      <Route path="/admin/connexion" component={AdminConnexion} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
