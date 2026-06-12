@@ -1,31 +1,10 @@
-import { useEffect } from "react";
-import { useLocation, Link } from "wouter";
-import { useAuth } from "@/lib/auth";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquarePlus, KeyRound, HeartHandshake } from "lucide-react";
 import { AppLayout } from "@/components/layout/AppLayout";
 
 export default function Home() {
-  const [, setLocation] = useLocation();
-  const { isAuthenticated, role } = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      if (!role) {
-        setLocation("/mon-ticket");
-      } else {
-        switch (role) {
-          case "n1": setLocation("/n1"); break;
-          case "n2": setLocation("/n2"); break;
-          case "rd": setLocation("/tableau-rd"); break;
-          case "pg": setLocation("/tableau-pg"); break;
-          case "admin": setLocation("/admin"); break;
-        }
-      }
-    }
-  }, [isAuthenticated, role, setLocation]);
-
   return (
     <AppLayout>
       <div className="flex flex-col items-center justify-center min-h-[70vh] max-w-3xl mx-auto text-center space-y-12">
@@ -34,11 +13,11 @@ export default function Home() {
             <HeartHandshake className="h-10 w-10 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-            Soutien pédagogique pour le pilote de la réforme du cycle d'orientation
+            Entraide pédagogique pour le pilote de la réforme du cycle d'orientation
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Un espace d'écoute et d'accompagnement dédié aux enseignantes et enseignants qui mettent en oeuvre les leviers pédagogiques du pilote de la réforme du CO. 
-            Posez vos questions en toute sérénité et de manière anonymes, nos experts pédagogiques vous répondent.
+            Posez vos questions en toute sérénité et de manière anonymes, des personnes ressources vous répondent.
           </p>
         </div>
 
@@ -50,12 +29,12 @@ export default function Home() {
               </div>
               <CardTitle>Nouvelle demande</CardTitle>
               <CardDescription className="text-base mt-2">
-                Ouvrez un nouveau ticket de manière totalement anonyme.
+                Soumettez une nouvelle demande de façon anonyme.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Link href="/nouveau-ticket">
-                <Button className="w-full" size="lg">Créer un ticket</Button>
+                <Button className="w-full" size="lg">Créer une demande</Button>
               </Link>
             </CardContent>
           </Card>

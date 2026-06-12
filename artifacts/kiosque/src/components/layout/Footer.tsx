@@ -1,3 +1,5 @@
+import { Link } from "wouter";
+
 export function Footer() {
   return (
     <footer className="border-t bg-white">
@@ -7,13 +9,20 @@ export function Footer() {
           alt="Armoiries de la République et canton de Genève"
           className="h-14 w-auto object-contain"
         />
-        <p className="max-w-xl">
-          Ce kiosque est créé par le{" "}
-          <span className="font-medium text-foreground">
-            Service enseignement et évaluation de la Direction générale de
-            l'enseignement obligatoire
-          </span>
-        </p>
+        <div className="max-w-xl space-y-2">
+          <p>
+            Ce kiosque est mis à disposition par le{" "}
+            <span className="font-medium text-foreground">
+              Service enseignement et évaluation de la Direction générale de
+              l'enseignement obligatoire
+            </span>
+          </p>
+          <p>
+            <Link href="/admin/connexion" className="text-xs underline hover:text-foreground">
+              Accès administration
+            </Link>
+          </p>
+        </div>
       </div>
     </footer>
   );
