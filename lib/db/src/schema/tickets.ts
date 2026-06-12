@@ -3,7 +3,6 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { schoolsTable } from "./schools";
 import { disciplinesTable } from "./disciplines";
-import { transversalDomainsTable } from "./transversalDomains";
 import { usersTable } from "./users";
 
 export const ticketsTable = pgTable("tickets", {
@@ -13,10 +12,10 @@ export const ticketsTable = pgTable("tickets", {
   assignedN2Id: integer("assigned_n2_id").references(() => usersTable.id),
   schoolId: integer("school_id").notNull().references(() => schoolsTable.id),
   disciplineId: integer("discipline_id").notNull().references(() => disciplinesTable.id),
-  transversalDomainId: integer("transversal_domain_id").references(() => transversalDomainsTable.id),
   description: text("description"),
   status: text("status").notNull().default("new"),
   webexLink: text("webex_link"),
+  webexScheduledAt: timestamp("webex_scheduled_at", { withTimezone: true }),
   webexCreatedAt: timestamp("webex_created_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
