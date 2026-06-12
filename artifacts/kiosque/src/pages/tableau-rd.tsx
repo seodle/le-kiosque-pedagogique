@@ -9,7 +9,7 @@ import { getToken, decodeToken } from "@/lib/auth";
 import { BarChart3, Clock, Ticket, TrendingUp, AlertTriangle, BookOpen, Building2, MessageSquareText, Trophy } from "lucide-react";
 import { getTicketStatusLabel, TICKET_STATUS_LABELS } from "@/lib/ticket-status";
 import { TicketBrowseCard } from "@/components/tickets/TicketBrowseCard";
-import { formatPercent } from "@/lib/format";
+import { formatDelayDays, formatPercent } from "@/lib/format";
 
 function ticketsLoadErrorMessage(error: unknown): string {
   if (error instanceof ApiError) {
@@ -187,7 +187,7 @@ export default function TableauRd() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {statCard("Demandes totales", dashboard.totalTickets, <Ticket className="h-6 w-6" />)}
             {statCard("Demandes ouvertes", dashboard.openTickets ?? 0, <AlertTriangle className="h-6 w-6" />, "actuellement")}
-            {statCard("Délai moyen", dashboard.avgPickupMinutes !== null ? `${Math.round(dashboard.avgPickupMinutes)} min` : "—", <Clock className="h-6 w-6" />, "avant prise en charge")}
+            {statCard("Délai moyen", formatDelayDays(dashboard.avgPickupMinutes), <Clock className="h-6 w-6" />, "avant prise en charge")}
             {statCard("Résolus", totalResolved, <TrendingUp className="h-6 w-6" />)}
           </div>
         )}
@@ -264,7 +264,7 @@ export default function TableauRd() {
                               <td className="py-3 pr-4 text-right">{d.totalTickets}</td>
                               <td className="py-3 pr-4 text-right">{formatPercent(d.resolutionRate)}</td>
                               <td className="py-3 pr-4 text-right">{formatPercent(d.escalationRate)}</td>
-                              <td className="py-3 text-right">{d.avgMinutes !== null ? `${Math.round(d.avgMinutes)} min` : "—"}</td>
+                              <td className="py-3 text-right">{formatDelayDays(d.avgMinutes)}</td>
                             </tr>
                           ))}
                         </tbody>

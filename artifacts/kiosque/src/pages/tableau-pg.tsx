@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useGetDashboardPg } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
 import { BarChart3, BookOpen, Building2, Ticket, TrendingUp, Trophy } from "lucide-react";
-import { formatPercent } from "@/lib/format";
+import { formatDelayDays, formatPercent } from "@/lib/format";
 
 export default function TableauPg() {
   const [, setLocation] = useLocation();
@@ -134,7 +134,7 @@ export default function TableauPg() {
                           <td className="py-3 pr-4 text-right">{s.totalTickets}</td>
                           <td className="py-3 pr-4 text-right">{formatPercent(s.resolutionRate)}</td>
                           <td className="py-3 pr-4 text-right">{formatPercent(s.escalationRate)}</td>
-                          <td className="py-3 text-right">{s.avgMinutes !== null ? `${Math.round(s.avgMinutes)} min` : "—"}</td>
+                          <td className="py-3 text-right">{formatDelayDays(s.avgMinutes)}</td>
                         </tr>
                       ))}
                     </tbody>

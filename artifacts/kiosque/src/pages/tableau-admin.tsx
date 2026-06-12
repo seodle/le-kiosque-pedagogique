@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useGetDashboardPg, useGetDashboardRd, useListDisciplines, useListSchools } from "@workspace/api-client-react";
 import { getToken, decodeToken } from "@/lib/auth";
 import { AlertTriangle, BarChart3, Building2, Clock, Ticket, TrendingUp, Trophy } from "lucide-react";
-import { formatPercent } from "@/lib/format";
+import { formatDelayDays, formatPercent } from "@/lib/format";
 
 function buildFilterLabel(schoolName?: string, disciplineName?: string): string {
   if (schoolName && disciplineName) return `Croisement : ${schoolName} × ${disciplineName}`;
@@ -146,7 +146,7 @@ export default function TableauAdmin() {
                     <div>
                       <p className="text-sm text-muted-foreground font-medium">Délai moyen</p>
                       <p className="text-3xl font-bold mt-1">
-                        {rd?.avgPickupMinutes != null ? `${Math.round(rd.avgPickupMinutes)} min` : "—"}
+                        {formatDelayDays(rd?.avgPickupMinutes)}
                       </p>
                     </div>
                     <div className="bg-primary/10 p-3 rounded-lg text-primary"><Clock className="h-6 w-6" /></div>
@@ -260,7 +260,7 @@ export default function TableauAdmin() {
                             <td className="py-3 pr-4 text-right">{s.totalTickets}</td>
                             <td className="py-3 pr-4 text-right">{formatPercent(s.resolutionRate ?? 0)}</td>
                             <td className="py-3 pr-4 text-right">{formatPercent(s.escalationRate ?? 0)}</td>
-                            <td className="py-3 text-right">{s.avgMinutes !== null ? `${Math.round(s.avgMinutes)} min` : "—"}</td>
+                            <td className="py-3 text-right">{formatDelayDays(s.avgMinutes)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -307,7 +307,7 @@ export default function TableauAdmin() {
                             <td className="py-3 pr-4 text-right">{d.totalTickets}</td>
                             <td className="py-3 pr-4 text-right">{formatPercent(d.resolutionRate ?? 0)}</td>
                             <td className="py-3 pr-4 text-right">{formatPercent(d.escalationRate ?? 0)}</td>
-                            <td className="py-3 text-right">{d.avgMinutes !== null ? `${Math.round(d.avgMinutes)} min` : "—"}</td>
+                            <td className="py-3 text-right">{formatDelayDays(d.avgMinutes)}</td>
                           </tr>
                         ))}
                       </tbody>
