@@ -300,8 +300,19 @@ export async function customFetch<T = unknown>(
 
   if (response.status === 401 && typeof window !== "undefined") {
     localStorage.removeItem("kiosque_token");
-    if (!window.location.pathname.startsWith("/connexion") && window.location.pathname !== "/") {
-      if (window.location.pathname.startsWith("/n1") || window.location.pathname.startsWith("/n2") || window.location.pathname.startsWith("/tableau") || window.location.pathname.startsWith("/admin")) {
+    if (
+      !window.location.pathname.startsWith("/connexion") &&
+      !window.location.pathname.startsWith("/admin/connexion") &&
+      window.location.pathname !== "/"
+    ) {
+      if (
+        window.location.pathname.startsWith("/admin") ||
+        window.location.pathname.startsWith("/tableau-admin") ||
+        window.location.pathname.startsWith("/tableau-rd") ||
+        window.location.pathname.startsWith("/tableau-pg")
+      ) {
+        window.location.href = "/admin/connexion";
+      } else if (window.location.pathname.startsWith("/f2") || window.location.pathname.startsWith("/f3")) {
         window.location.href = "/connexion";
       } else {
         window.location.href = "/";

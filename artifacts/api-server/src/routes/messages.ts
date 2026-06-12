@@ -74,8 +74,8 @@ router.get("/messages/ticket/:ticketId", authenticate, requireTeacherOrStaff, as
   const payload = req.authPayload!;
   const { ticketId } = params.data;
 
-  // RD and PG cannot access messages
-  if (payload.type === "staff" && (payload.role === "rd" || payload.role === "pg")) {
+  // RD, direction and PG cannot access messages
+  if (payload.type === "staff" && ["rd", "direction", "pg"].includes(payload.role)) {
     res.status(403).json({ error: "Forbidden" });
     return;
   }

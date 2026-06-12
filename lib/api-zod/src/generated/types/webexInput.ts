@@ -8,4 +8,6 @@
 
 export interface WebexInput {
   webexLink: string;
+  /** Date et heure de la session visio */
+  scheduledAt: Date;
 }

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET ?? process.env.SESSION_SECRET ?? "kiosque-dev-secret";
 
 export type TokenPayload =
-  | { type: "staff"; userId: number; role: string; email: string }
+  | { type: "staff"; userId: number; role: string; username: string }
   | { type: "teacher"; ticketId: number };
 
 export function signToken(payload: TokenPayload, expiresIn: string): string {

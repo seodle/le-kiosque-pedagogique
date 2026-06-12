@@ -7,11 +7,10 @@
  */
 import type { Discipline } from './discipline';
 import type { School } from './school';
-import type { TransversalDomain } from './transversalDomain';
 
 export interface User {
   id: number;
-  email: string;
+  username: string;
   role: string;
   /** @nullable */
   schoolId?: number | null;
@@ -20,5 +19,4 @@ export interface User {
   active?: boolean;
   school?: School;
   discipline?: Discipline;
-  domains?: TransversalDomain[];
 }

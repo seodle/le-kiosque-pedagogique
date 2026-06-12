@@ -7,6 +7,7 @@
  */
 
 export interface StaffCredentials {
-  email: string;
+  /** @minLength 2 */
+  username: string;
   password: string;
 }

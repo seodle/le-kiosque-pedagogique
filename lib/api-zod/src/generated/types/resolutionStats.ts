@@ -7,7 +7,7 @@
  */
 
 export interface ResolutionStats {
-  n1?: number;
-  n2?: number;
+  f2?: number;
+  f3?: number;
   webex?: number;
 }

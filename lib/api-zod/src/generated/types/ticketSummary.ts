@@ -7,18 +7,16 @@
  */
 import type { Discipline } from './discipline';
 import type { School } from './school';
-import type { TransversalDomain } from './transversalDomain';
 
 export interface TicketSummary {
   id: number;
   status: string;
+  /** @nullable */
+  description?: string | null;
   schoolId?: number;
   disciplineId?: number;
-  /** @nullable */
-  transversalDomainId?: number | null;
   createdAt: string;
   updatedAt?: string;
   school?: School;
   discipline?: Discipline;
-  transversalDomain?: TransversalDomain;
 }

@@ -17,10 +17,14 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary Login for staff users (N1, N2, RD, PG, admin)
+ * @summary Login for staff users (F2, F3, RD, PG, direction, admin)
  */
+export const staffLoginBodyUsernameMin = 2;
+
+
+
 export const StaffLoginBody = zod.object({
-  "email": zod.string(),
+  "username": zod.string().min(staffLoginBodyUsernameMin),
   "password": zod.string()
 })
 
@@ -28,7 +32,7 @@ export const StaffLoginResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "username": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
@@ -43,11 +47,7 @@ export const StaffLoginResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "domains": zod.array(zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})).optional()
+}).optional()
 }).optional()
 })
 
@@ -57,7 +57,7 @@ export const StaffLoginResponse = zod.object({
  */
 export const GetMeResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "username": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
@@ -72,11 +72,7 @@ export const GetMeResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "domains": zod.array(zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})).optional()
+}).optional()
 })
 
 
@@ -102,7 +98,7 @@ export const LoginTicketResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "username": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
@@ -117,11 +113,7 @@ export const LoginTicketResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "domains": zod.array(zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})).optional()
+}).optional()
 }).optional()
 })
 
@@ -134,9 +126,9 @@ export const GetMyTicketResponse = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -151,10 +143,8 @@ export const GetMyTicketResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -170,9 +160,9 @@ export const GetTicketResponse = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -187,10 +177,8 @@ export const GetTicketResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -206,9 +194,9 @@ export const ClaimTicketResponse = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -223,10 +211,8 @@ export const ClaimTicketResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -237,18 +223,14 @@ export const EscalateTicketParams = zod.object({
   "id": zod.coerce.number()
 })
 
-export const EscalateTicketBody = zod.object({
-  "transversalDomainId": zod.number()
-})
-
 export const EscalateTicketResponse = zod.object({
   "id": zod.number(),
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -263,10 +245,8 @@ export const EscalateTicketResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -282,9 +262,9 @@ export const ResolveTicketN1Response = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -299,10 +279,8 @@ export const ResolveTicketN1Response = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -318,9 +296,9 @@ export const ResolveTicketResponse = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -335,22 +313,21 @@ export const ResolveTicketResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
 /**
- * @summary Close a ticket with Webex session link (N2 only)
+ * @summary Schedule a collective visio session (F3 only)
  */
 export const CloseTicketWebexParams = zod.object({
   "id": zod.coerce.number()
 })
 
 export const CloseTicketWebexBody = zod.object({
-  "webexLink": zod.string()
+  "webexLink": zod.string(),
+  "scheduledAt": zod.coerce.date().describe('Date et heure de la session visio')
 })
 
 export const CloseTicketWebexResponse = zod.object({
@@ -358,9 +335,9 @@ export const CloseTicketWebexResponse = zod.object({
   "status": zod.string(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
   "webexCreatedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
@@ -375,10 +352,84 @@ export const CloseTicketWebexResponse = zod.object({
   "name": zod.string(),
   "active": zod.boolean().optional()
 }).optional(),
-  "transversalDomain": zod.object({
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
+})
+
+
+/**
+ * @summary Reassign a ticket to another F2 (current assignee only)
+ */
+export const ReassignTicketN1Params = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ReassignTicketN1Body = zod.object({
+  "targetUserId": zod.number()
+})
+
+export const ReassignTicketN1Response = zod.object({
   "id": zod.number(),
-  "name": zod.string()
-}).optional()
+  "status": zod.string(),
+  "schoolId": zod.number().optional(),
+  "disciplineId": zod.number().optional(),
+  "description": zod.string().nullish(),
+  "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
+  "webexCreatedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string().optional(),
+  "school": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "city": zod.string().nullish(),
+  "active": zod.boolean().optional()
+}).optional(),
+  "discipline": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "active": zod.boolean().optional()
+}).optional(),
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
+})
+
+
+/**
+ * @summary Reassign a ticket to another F3 (current assignee only)
+ */
+export const ReassignTicketN2Params = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ReassignTicketN2Body = zod.object({
+  "targetUserId": zod.number()
+})
+
+export const ReassignTicketN2Response = zod.object({
+  "id": zod.number(),
+  "status": zod.string(),
+  "schoolId": zod.number().optional(),
+  "disciplineId": zod.number().optional(),
+  "description": zod.string().nullish(),
+  "webexLink": zod.string().nullish(),
+  "webexScheduledAt": zod.coerce.date().nullish(),
+  "webexCreatedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string().optional(),
+  "school": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "city": zod.string().nullish(),
+  "active": zod.boolean().optional()
+}).optional(),
+  "discipline": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "active": zod.boolean().optional()
+}).optional(),
+  "assignedN1Id": zod.number().nullish().describe('Visible par le staff uniquement'),
+  "assignedN2Id": zod.number().nullish().describe('Visible par le staff uniquement')
 })
 
 
@@ -416,9 +467,9 @@ export const GetTicketMessagesResponse = zod.array(GetTicketMessagesResponseItem
 export const GetPoolResponseItem = zod.object({
   "id": zod.number(),
   "status": zod.string(),
+  "description": zod.string().nullish(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
   "school": zod.object({
@@ -431,10 +482,6 @@ export const GetPoolResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
 }).optional()
 })
 export const GetPoolResponse = zod.array(GetPoolResponseItem)
@@ -443,12 +490,16 @@ export const GetPoolResponse = zod.array(GetPoolResponseItem)
 /**
  * @summary Get tickets assigned to the current intervener
  */
+export const GetMyAssignedTicketsQueryParams = zod.object({
+  "resolved": zod.coerce.boolean().optional().describe('When true, returns resolved\/closed tickets instead of in-progress ones')
+})
+
 export const GetMyAssignedTicketsResponseItem = zod.object({
   "id": zod.number(),
   "status": zod.string(),
+  "description": zod.string().nullish(),
   "schoolId": zod.number().optional(),
   "disciplineId": zod.number().optional(),
-  "transversalDomainId": zod.number().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string().optional(),
   "school": zod.object({
@@ -461,47 +512,103 @@ export const GetMyAssignedTicketsResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "transversalDomain": zod.object({
-  "id": zod.number(),
-  "name": zod.string()
 }).optional()
 })
 export const GetMyAssignedTicketsResponse = zod.array(GetMyAssignedTicketsResponseItem)
 
 
 /**
+ * @summary List colleagues available for reassignment (same role)
+ */
+export const ListIntervenerColleaguesResponseItem = zod.object({
+  "id": zod.number(),
+  "username": zod.string()
+})
+export const ListIntervenerColleaguesResponse = zod.array(ListIntervenerColleaguesResponseItem)
+
+
+/**
  * @summary Get RD dashboard stats
  */
+export const GetDashboardRdQueryParams = zod.object({
+  "disciplineId": zod.coerce.number().optional().describe('Filtre par discipline (admin uniquement)'),
+  "schoolId": zod.coerce.number().optional().describe('Filtre par établissement (admin uniquement)')
+})
+
 export const GetDashboardRdResponse = zod.object({
   "totalTickets": zod.number(),
+  "schoolId": zod.number().nullish(),
+  "disciplineId": zod.number().nullish(),
+  "disciplineName": zod.string().nullish(),
+  "schoolName": zod.string().nullish(),
   "openTickets": zod.number().optional(),
   "avgPickupMinutes": zod.number().nullable(),
   "resolutionByLevel": zod.object({
-  "n1": zod.number().optional(),
-  "n2": zod.number().optional(),
+  "f2": zod.number().optional(),
+  "f3": zod.number().optional(),
   "webex": zod.number().optional()
 }),
-  "escalationsByDomain": zod.array(zod.object({
-  "domain": zod.string(),
-  "count": zod.number()
-})),
   "ticketsByStatus": zod.array(zod.object({
   "status": zod.string(),
   "count": zod.number()
-})).optional()
+})).optional(),
+  "disciplineRankings": zod.array(zod.object({
+  "disciplineId": zod.number(),
+  "disciplineName": zod.string(),
+  "totalTickets": zod.number(),
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "avgMinutes": zod.number().nullable()
+})).optional().describe('Statistiques par discipline (vue direction, périmètre établissement)')
 })
 
 
 /**
- * @summary Get PG dashboard stats (all schools)
+ * @summary List tickets in RD scope (read-only, descriptions included)
+ */
+export const ListRdTicketsQueryParams = zod.object({
+  "disciplineId": zod.coerce.number().optional().describe('Filtre par discipline (admin uniquement)'),
+  "schoolId": zod.coerce.number().optional().describe('Filtre par établissement (admin uniquement)'),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListRdTicketsResponseItem = zod.object({
+  "id": zod.number(),
+  "status": zod.string(),
+  "description": zod.string().nullish(),
+  "schoolId": zod.number().optional(),
+  "disciplineId": zod.number().optional(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string().optional(),
+  "school": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "city": zod.string().nullish(),
+  "active": zod.boolean().optional()
+}).optional(),
+  "discipline": zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "active": zod.boolean().optional()
+}).optional()
+})
+export const ListRdTicketsResponse = zod.array(ListRdTicketsResponseItem)
+
+
+/**
+ * @summary Get PG dashboard stats (scoped to account discipline)
  */
 export const GetDashboardPgQueryParams = zod.object({
-  "disciplineId": zod.coerce.number().optional()
+  "disciplineId": zod.coerce.number().optional().describe('Filtre par discipline (admin uniquement)'),
+  "schoolId": zod.coerce.number().optional().describe('Filtre par établissement (admin uniquement)')
 })
 
 export const GetDashboardPgResponse = zod.object({
   "totalTickets": zod.number(),
+  "schoolId": zod.number().nullish(),
+  "schoolName": zod.string().nullish(),
+  "disciplineId": zod.number().nullish(),
+  "disciplineName": zod.string().nullish(),
   "monthlyTrend": zod.array(zod.object({
   "month": zod.string(),
   "count": zod.number()
@@ -510,13 +617,17 @@ export const GetDashboardPgResponse = zod.object({
   "schoolId": zod.number(),
   "schoolName": zod.string(),
   "totalTickets": zod.number(),
-  "escalationRate": zod.number(),
-  "avgMinutes": zod.number().nullable(),
-  "dominantDomain": zod.string().nullish()
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "avgMinutes": zod.number().nullable()
 })),
-  "topDomains": zod.array(zod.object({
-  "domain": zod.string(),
-  "count": zod.number()
+  "disciplineRankings": zod.array(zod.object({
+  "disciplineId": zod.number(),
+  "disciplineName": zod.string(),
+  "totalTickets": zod.number(),
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "avgMinutes": zod.number().nullable()
 }))
 })
 
@@ -545,21 +656,11 @@ export const ListDisciplinesResponse = zod.array(ListDisciplinesResponseItem)
 
 
 /**
- * @summary List all transversal domains
- */
-export const ListTransversalDomainsResponseItem = zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})
-export const ListTransversalDomainsResponse = zod.array(ListTransversalDomainsResponseItem)
-
-
-/**
  * @summary List all users (admin only)
  */
 export const ListUsersResponseItem = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "username": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
@@ -574,11 +675,7 @@ export const ListUsersResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "domains": zod.array(zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})).optional()
+}).optional()
 })
 export const ListUsersResponse = zod.array(ListUsersResponseItem)
 
@@ -586,13 +683,16 @@ export const ListUsersResponse = zod.array(ListUsersResponseItem)
 /**
  * @summary Create a new staff user (admin only)
  */
+export const createUserBodyUsernameMin = 2;
+
+
+
 export const CreateUserBody = zod.object({
-  "email": zod.string(),
+  "username": zod.string().min(createUserBodyUsernameMin),
   "password": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
-  "disciplineId": zod.number().nullish(),
-  "domainIds": zod.array(zod.number()).optional()
+  "disciplineId": zod.number().nullish()
 })
 
 
@@ -603,19 +703,22 @@ export const UpdateUserParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const updateUserBodyUsernameMin = 2;
+
+
+
 export const UpdateUserBody = zod.object({
-  "email": zod.string().optional(),
+  "username": zod.string().min(updateUserBodyUsernameMin).optional(),
   "password": zod.string().optional(),
   "role": zod.string().optional(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
-  "domainIds": zod.array(zod.number()).optional(),
   "active": zod.boolean().optional()
 })
 
 export const UpdateUserResponse = zod.object({
   "id": zod.number(),
-  "email": zod.string(),
+  "username": zod.string(),
   "role": zod.string(),
   "schoolId": zod.number().nullish(),
   "disciplineId": zod.number().nullish(),
@@ -630,11 +733,15 @@ export const UpdateUserResponse = zod.object({
   "id": zod.number(),
   "name": zod.string(),
   "active": zod.boolean().optional()
-}).optional(),
-  "domains": zod.array(zod.object({
-  "id": zod.number(),
-  "name": zod.string()
-})).optional()
+}).optional()
+})
+
+
+/**
+ * @summary Delete a staff user (admin only)
+ */
+export const DeleteUserParams = zod.object({
+  "id": zod.coerce.number()
 })
 
 

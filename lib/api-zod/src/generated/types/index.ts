@@ -7,17 +7,21 @@
  */
 
 export * from './authResult';
+export * from './colleague';
 export * from './discipline';
 export * from './disciplineInput';
-export * from './domainCount';
-export * from './escalateInput';
+export * from './disciplineRanking';
 export * from './getDashboardPgParams';
+export * from './getDashboardRdParams';
+export * from './getMyAssignedTicketsParams';
 export * from './healthStatus';
+export * from './listRdTicketsParams';
 export * from './message';
 export * from './messageInput';
 export * from './monthlyCount';
 export * from './pgDashboard';
 export * from './rdDashboard';
+export * from './reassignInput';
 export * from './resolutionStats';
 export * from './school';
 export * from './schoolInput';
@@ -29,7 +33,6 @@ export * from './ticketCredentials';
 export * from './ticketDetail';
 export * from './ticketInput';
 export * from './ticketSummary';
-export * from './transversalDomain';
 export * from './user';
 export * from './userInput';
 export * from './userUpdate';

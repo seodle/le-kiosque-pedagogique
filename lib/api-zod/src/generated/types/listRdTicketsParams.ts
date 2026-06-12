@@ -6,7 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetDashboardPgParams = {
+export type ListRdTicketsParams = {
 /**
  * Filtre par discipline (admin uniquement)
  */
@@ -15,4 +15,5 @@ disciplineId?: number;
  * Filtre par établissement (admin uniquement)
  */
 schoolId?: number;
+status?: string;
 };

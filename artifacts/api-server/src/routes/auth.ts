@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import bcrypt from "bcryptjs";
-import { db, usersTable, userDomainsTable, schoolsTable, disciplinesTable, transversalDomainsTable } from "@workspace/db";
-import { eq, inArray } from "drizzle-orm";
+import { db, usersTable, schoolsTable, disciplinesTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 import { StaffLoginBody, GetMeResponse } from "@workspace/api-zod";
 import { signToken } from "../lib/jwt.js";
 import { authenticate } from "../middlewares/authenticate.js";
@@ -15,8 +15,8 @@ router.post("/auth/staff-login", async (req, res): Promise<void> => {
     return;
   }
 
-  const { email, password } = parsed.data;
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+  const { username, password } = parsed.data;
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.username, username));
 
   if (!user || !user.active) {
     res.status(401).json({ error: "Identifiants invalides" });
@@ -30,7 +30,7 @@ router.post("/auth/staff-login", async (req, res): Promise<void> => {
   }
 
   const token = signToken(
-    { type: "staff", userId: user.id, role: user.role, email: user.email },
+    { type: "staff", userId: user.id, role: user.role, username: user.username },
     "8h",
   );
 
@@ -62,22 +62,15 @@ async function buildUserResponse(user: typeof usersTable.$inferSelect) {
     ? await db.select().from(disciplinesTable).where(eq(disciplinesTable.id, user.disciplineId))
     : [null];
 
-  const domainLinks = await db.select().from(userDomainsTable).where(eq(userDomainsTable.userId, user.id));
-  const domainIds = domainLinks.map((d) => d.domainId);
-  const domains = domainIds.length
-    ? await db.select().from(transversalDomainsTable).where(inArray(transversalDomainsTable.id, domainIds))
-    : [];
-
   return GetMeResponse.parse({
     id: user.id,
-    email: user.email,
+    username: user.username,
     role: user.role,
     schoolId: user.schoolId ?? null,
     disciplineId: user.disciplineId ?? null,
     active: user.active,
     school: school ?? undefined,
     discipline: discipline ?? undefined,
-    domains,
   });
 }
 

@@ -5,16 +5,25 @@
  * Le Kiosque Pédagogique API
  * OpenAPI spec version: 0.1.0
  */
-import type { DomainCount } from './domainCount';
+import type { DisciplineRanking } from './disciplineRanking';
 import type { ResolutionStats } from './resolutionStats';
 import type { StatusCount } from './statusCount';
 
 export interface RdDashboard {
   totalTickets: number;
+  /** @nullable */
+  schoolId?: number | null;
+  /** @nullable */
+  disciplineId?: number | null;
+  /** @nullable */
+  disciplineName?: string | null;
+  /** @nullable */
+  schoolName?: string | null;
   openTickets?: number;
   /** @nullable */
   avgPickupMinutes: number | null;
   resolutionByLevel: ResolutionStats;
-  escalationsByDomain: DomainCount[];
   ticketsByStatus?: StatusCount[];
+  /** Statistiques par discipline (vue direction, périmètre établissement) */
+  disciplineRankings?: DisciplineRanking[];
 }

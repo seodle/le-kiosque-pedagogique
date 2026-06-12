@@ -7,7 +7,6 @@
  */
 import type { Discipline } from './discipline';
 import type { School } from './school';
-import type { TransversalDomain } from './transversalDomain';
 
 export interface TicketDetail {
   id: number;
@@ -15,16 +14,25 @@ export interface TicketDetail {
   schoolId?: number;
   disciplineId?: number;
   /** @nullable */
-  transversalDomainId?: number | null;
-  /** @nullable */
   description?: string | null;
   /** @nullable */
   webexLink?: string | null;
+  /** @nullable */
+  webexScheduledAt?: Date | null;
   /** @nullable */
   webexCreatedAt?: string | null;
   createdAt: string;
   updatedAt?: string;
   school?: School;
   discipline?: Discipline;
-  transversalDomain?: TransversalDomain;
+  /**
+     * Visible par le staff uniquement
+     * @nullable
+     */
+  assignedN1Id?: number | null;
+  /**
+     * Visible par le staff uniquement
+     * @nullable
+     */
+  assignedN2Id?: number | null;
 }

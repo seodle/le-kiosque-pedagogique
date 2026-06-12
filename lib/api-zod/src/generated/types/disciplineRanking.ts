@@ -6,9 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface SchoolRanking {
-  schoolId: number;
-  schoolName: string;
+export interface DisciplineRanking {
+  disciplineId: number;
+  disciplineName: string;
   totalTickets: number;
   /** Percentage 0–100 of tickets remontés vers F3 */
   escalationRate: number;

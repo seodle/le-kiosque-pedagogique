@@ -10,7 +10,8 @@ export interface HealthStatus {
 }
 
 export interface StaffCredentials {
-  email: string;
+  /** @minLength 2 */
+  username: string;
   password: string;
 }
 
@@ -28,14 +29,9 @@ export interface Discipline {
   active?: boolean;
 }
 
-export interface TransversalDomain {
-  id: number;
-  name: string;
-}
-
 export interface User {
   id: number;
-  email: string;
+  username: string;
   role: string;
   /** @nullable */
   schoolId?: number | null;
@@ -44,7 +40,6 @@ export interface User {
   active?: boolean;
   school?: School;
   discipline?: Discipline;
-  domains?: TransversalDomain[];
 }
 
 export interface AuthResult {
@@ -53,25 +48,25 @@ export interface AuthResult {
 }
 
 export interface UserInput {
-  email: string;
+  /** @minLength 2 */
+  username: string;
   password: string;
   role: string;
   /** @nullable */
   schoolId?: number | null;
   /** @nullable */
   disciplineId?: number | null;
-  domainIds?: number[];
 }
 
 export interface UserUpdate {
-  email?: string;
+  /** @minLength 2 */
+  username?: string;
   password?: string;
   role?: string;
   /** @nullable */
   schoolId?: number | null;
   /** @nullable */
   disciplineId?: number | null;
-  domainIds?: number[];
   active?: boolean;
 }
 
@@ -95,15 +90,14 @@ export interface TicketCreated {
 export interface TicketSummary {
   id: number;
   status: string;
+  /** @nullable */
+  description?: string | null;
   schoolId?: number;
   disciplineId?: number;
-  /** @nullable */
-  transversalDomainId?: number | null;
   createdAt: string;
   updatedAt?: string;
   school?: School;
   discipline?: Discipline;
-  transversalDomain?: TransversalDomain;
 }
 
 export interface TicketDetail {
@@ -112,26 +106,42 @@ export interface TicketDetail {
   schoolId?: number;
   disciplineId?: number;
   /** @nullable */
-  transversalDomainId?: number | null;
-  /** @nullable */
   description?: string | null;
   /** @nullable */
   webexLink?: string | null;
+  /** @nullable */
+  webexScheduledAt?: string | null;
   /** @nullable */
   webexCreatedAt?: string | null;
   createdAt: string;
   updatedAt?: string;
   school?: School;
   discipline?: Discipline;
-  transversalDomain?: TransversalDomain;
+  /**
+     * Visible par le staff uniquement
+     * @nullable
+     */
+  assignedN1Id?: number | null;
+  /**
+     * Visible par le staff uniquement
+     * @nullable
+     */
+  assignedN2Id?: number | null;
 }
 
-export interface EscalateInput {
-  transversalDomainId: number;
+export interface Colleague {
+  id: number;
+  username: string;
+}
+
+export interface ReassignInput {
+  targetUserId: number;
 }
 
 export interface WebexInput {
   webexLink: string;
+  /** Date et heure de la session visio */
+  scheduledAt: string;
 }
 
 export interface Message {
@@ -151,14 +161,9 @@ export interface MessageInput {
 }
 
 export interface ResolutionStats {
-  n1?: number;
-  n2?: number;
+  f2?: number;
+  f3?: number;
   webex?: number;
-}
-
-export interface DomainCount {
-  domain: string;
-  count: number;
 }
 
 export interface StatusCount {
@@ -166,14 +171,35 @@ export interface StatusCount {
   count: number;
 }
 
+export interface DisciplineRanking {
+  disciplineId: number;
+  disciplineName: string;
+  totalTickets: number;
+  /** Percentage 0–100 of tickets remontés vers F3 */
+  escalationRate: number;
+  /** Percentage 0–100 of tickets résolus (F2, F3 ou Webex) */
+  resolutionRate: number;
+  /** @nullable */
+  avgMinutes: number | null;
+}
+
 export interface RdDashboard {
   totalTickets: number;
+  /** @nullable */
+  schoolId?: number | null;
+  /** @nullable */
+  disciplineId?: number | null;
+  /** @nullable */
+  disciplineName?: string | null;
+  /** @nullable */
+  schoolName?: string | null;
   openTickets?: number;
   /** @nullable */
   avgPickupMinutes: number | null;
   resolutionByLevel: ResolutionStats;
-  escalationsByDomain: DomainCount[];
   ticketsByStatus?: StatusCount[];
+  /** Statistiques par discipline (vue direction, périmètre établissement) */
+  disciplineRankings?: DisciplineRanking[];
 }
 
 export interface MonthlyCount {
@@ -185,18 +211,27 @@ export interface SchoolRanking {
   schoolId: number;
   schoolName: string;
   totalTickets: number;
+  /** Percentage 0–100 of tickets remontés vers F3 */
   escalationRate: number;
+  /** Percentage 0–100 of tickets résolus (F2, F3 ou Webex) */
+  resolutionRate: number;
   /** @nullable */
   avgMinutes: number | null;
-  /** @nullable */
-  dominantDomain?: string | null;
 }
 
 export interface PgDashboard {
   totalTickets: number;
+  /** @nullable */
+  schoolId?: number | null;
+  /** @nullable */
+  schoolName?: string | null;
+  /** @nullable */
+  disciplineId?: number | null;
+  /** @nullable */
+  disciplineName?: string | null;
   monthlyTrend: MonthlyCount[];
   schoolRankings: SchoolRanking[];
-  topDomains: DomainCount[];
+  disciplineRankings: DisciplineRanking[];
 }
 
 export interface SchoolInput {
@@ -208,7 +243,44 @@ export interface DisciplineInput {
   name: string;
 }
 
-export type GetDashboardPgParams = {
+export type GetMyAssignedTicketsParams = {
+/**
+ * When true, returns resolved/closed tickets instead of in-progress ones
+ */
+resolved?: boolean;
+};
+
+export type GetDashboardRdParams = {
+/**
+ * Filtre par discipline (admin uniquement)
+ */
 disciplineId?: number;
+/**
+ * Filtre par établissement (admin uniquement)
+ */
+schoolId?: number;
+};
+
+export type ListRdTicketsParams = {
+/**
+ * Filtre par discipline (admin uniquement)
+ */
+disciplineId?: number;
+/**
+ * Filtre par établissement (admin uniquement)
+ */
+schoolId?: number;
+status?: string;
+};
+
+export type GetDashboardPgParams = {
+/**
+ * Filtre par discipline (admin uniquement)
+ */
+disciplineId?: number;
+/**
+ * Filtre par établissement (admin uniquement)
+ */
+schoolId?: number;
 };
 

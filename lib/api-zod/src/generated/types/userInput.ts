@@ -7,12 +7,12 @@
  */
 
 export interface UserInput {
-  email: string;
+  /** @minLength 2 */
+  username: string;
   password: string;
   role: string;
   /** @nullable */
   schoolId?: number | null;
   /** @nullable */
   disciplineId?: number | null;
-  domainIds?: number[];
 }

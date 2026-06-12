@@ -5,13 +5,21 @@
  * Le Kiosque Pédagogique API
  * OpenAPI spec version: 0.1.0
  */
-import type { DomainCount } from './domainCount';
+import type { DisciplineRanking } from './disciplineRanking';
 import type { MonthlyCount } from './monthlyCount';
 import type { SchoolRanking } from './schoolRanking';
 
 export interface PgDashboard {
   totalTickets: number;
+  /** @nullable */
+  schoolId?: number | null;
+  /** @nullable */
+  schoolName?: string | null;
+  /** @nullable */
+  disciplineId?: number | null;
+  /** @nullable */
+  disciplineName?: string | null;
   monthlyTrend: MonthlyCount[];
   schoolRankings: SchoolRanking[];
-  topDomains: DomainCount[];
+  disciplineRankings: DisciplineRanking[];
 }

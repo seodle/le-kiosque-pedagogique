@@ -6,7 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type GetDashboardPgParams = {
+export type GetDashboardRdParams = {
 /**
  * Filtre par discipline (admin uniquement)
  */
