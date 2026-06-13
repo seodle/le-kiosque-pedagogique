@@ -17,7 +17,7 @@ export default function Home() {
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Un espace d'écoute et d'accompagnement dédié aux enseignantes et enseignants qui mettent en oeuvre les leviers pédagogiques du pilote de la réforme du CO. 
-            Posez vos questions en toute sérénité et de manière anonymes, des personnes ressources vous répondent.
+            Posez vos questions en toute sérénité et de façon anonyme, des personnes ressources vous répondent.
           </p>
         </div>
 

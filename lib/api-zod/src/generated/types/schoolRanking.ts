@@ -10,9 +10,9 @@ export interface SchoolRanking {
   schoolId: number;
   schoolName: string;
   totalTickets: number;
-  /** Percentage 0–100 of tickets remontés vers F3 */
+  /** Percentage 0–100 of tickets remontés vers F1 */
   escalationRate: number;
-  /** Percentage 0–100 of tickets résolus (F2, F3 ou Webex) */
+  /** Percentage 0–100 of tickets résolus (F1, F2 ou Webex) */
   resolutionRate: number;
   /** @nullable */
   avgMinutes: number | null;

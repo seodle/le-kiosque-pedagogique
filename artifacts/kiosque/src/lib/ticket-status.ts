@@ -1,10 +1,10 @@
 export const TICKET_STATUS_LABELS: Record<string, string> = {
   new: "Nouvelle",
   assigned_n1: "Prise en charge F2",
-  escalated: "Remontée vers F3",
-  assigned_n2: "Prise en charge F3",
+  escalated: "Remontée vers F1",
+  assigned_n2: "Prise en charge F1",
   closed_n1: "Traitée par F2",
-  closed_resolved: "Traitée par F3",
+  closed_resolved: "Traitée par F1",
   closed_webex: "Visio programmée",
 };
 

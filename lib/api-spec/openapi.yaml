@@ -36,7 +36,7 @@ paths:
     post:
       operationId: staffLogin
       tags: [auth]
-      summary: Login for staff users (F2, F3, RD, PG, direction, admin)
+      summary: Login for staff users (F1, F2, RD, PG, direction, admin)
       requestBody:
         required: true
         content:
@@ -229,7 +229,7 @@ paths:
     patch:
       operationId: closeTicketWebex
       tags: [tickets]
-      summary: Schedule a collective visio session (F3 only)
+      summary: Schedule a collective visio session (F1 only)
       parameters:
         - name: id
           in: path
@@ -281,7 +281,7 @@ paths:
     patch:
       operationId: reassignTicketN2
       tags: [tickets]
-      summary: Reassign a ticket to another F3 (current assignee only)
+      summary: Reassign a ticket to another F1 (current assignee only)
       parameters:
         - name: id
           in: path
@@ -931,7 +931,7 @@ components:
       properties:
         f2:
           type: integer
-        f3:
+        f1:
           type: integer
         webex:
           type: integer
@@ -966,10 +966,10 @@ components:
           type: integer
         escalationRate:
           type: number
-          description: Percentage 0–100 of tickets remontés vers F3
+          description: Percentage 0–100 of tickets remontés vers F1
         resolutionRate:
           type: number
-          description: Percentage 0–100 of tickets résolus (F2, F3 ou Webex)
+          description: Percentage 0–100 of tickets résolus (F1, F2 ou Webex)
         avgMinutes:
           type: ["number", "null"]
 
@@ -985,10 +985,10 @@ components:
           type: integer
         escalationRate:
           type: number
-          description: Percentage 0–100 of tickets remontés vers F3
+          description: Percentage 0–100 of tickets remontés vers F1
         resolutionRate:
           type: number
-          description: Percentage 0–100 of tickets résolus (F2, F3 ou Webex)
+          description: Percentage 0–100 of tickets résolus (F1, F2 ou Webex)
         avgMinutes:
           type: ["number", "null"]
 

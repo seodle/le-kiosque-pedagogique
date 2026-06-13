@@ -126,8 +126,8 @@ router.get("/tickets/:id", authenticate, requireTeacherOrStaff, async (req, res)
   res.json(await buildTicketDetail(ticket, { includeAssignees: payload.type === "staff" }));
 });
 
-// ── CLAIM TICKET (F2 or F3) ──────────────────────────────────────────────────
-router.patch("/tickets/:id/claim", authenticate, requireStaff("f2", "f3"), async (req, res): Promise<void> => {
+// ── CLAIM TICKET (F2 or F1) ──────────────────────────────────────────────────
+router.patch("/tickets/:id/claim", authenticate, requireStaff("f2", "f1"), async (req, res): Promise<void> => {
   const params = ClaimTicketParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -147,14 +147,14 @@ router.patch("/tickets/:id/claim", authenticate, requireStaff("f2", "f3"), async
   }
 
   const isF2 = payload.role === "f2";
-  const isF3 = payload.role === "f3";
+  const isF1 = payload.role === "f1";
 
   if (isF2 && ticket.status !== "new") {
     res.status(409).json({ error: "Ticket non disponible" });
     return;
   }
-  if (isF3 && ticket.status !== "escalated") {
-    res.status(409).json({ error: "Ticket non disponible pour F3" });
+  if (isF1 && ticket.status !== "escalated") {
+    res.status(409).json({ error: "Ticket non disponible pour F1" });
     return;
   }
 
@@ -255,8 +255,8 @@ router.patch("/tickets/:id/reassign-n1", authenticate, requireStaff("f2"), async
   res.json(await buildTicketDetail(updated, { includeAssignees: true }));
 });
 
-// ── REASSIGN F3 ──────────────────────────────────────────────────────────────
-router.patch("/tickets/:id/reassign-n2", authenticate, requireStaff("f3"), async (req, res): Promise<void> => {
+// ── REASSIGN F1 ──────────────────────────────────────────────────────────────
+router.patch("/tickets/:id/reassign-n2", authenticate, requireStaff("f1"), async (req, res): Promise<void> => {
   const params = ReassignTicketN2Params.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -287,7 +287,7 @@ router.patch("/tickets/:id/reassign-n2", authenticate, requireStaff("f3"), async
   }
 
   const [target] = await db.select().from(usersTable).where(eq(usersTable.id, body.data.targetUserId));
-  if (!target || target.role !== "f3" || !target.active || target.id === payload.userId) {
+  if (!target || target.role !== "f1" || !target.active || target.id === payload.userId) {
     res.status(400).json({ error: "Personne ressource cible invalide" });
     return;
   }
@@ -301,7 +301,7 @@ router.patch("/tickets/:id/reassign-n2", authenticate, requireStaff("f3"), async
   await db.insert(ticketEventsTable).values({
     ticketId: ticket.id,
     actorId: payload.userId,
-    actorRole: "f3",
+    actorRole: "f1",
     eventType: "reassigned_n2",
     oldStatus: ticket.status,
     newStatus: ticket.status,
@@ -318,7 +318,7 @@ router.patch("/tickets/:id/reassign-n2", authenticate, requireStaff("f3"), async
   res.json(await buildTicketDetail(updated, { includeAssignees: true }));
 });
 
-// ── ESCALATE (F2 → F3) ───────────────────────────────────────────────────────
+// ── ESCALATE (F2 → F1) ───────────────────────────────────────────────────────
 router.patch("/tickets/:id/escalate", authenticate, requireStaff("f2"), async (req, res): Promise<void> => {
   const params = EscalateTicketParams.safeParse(req.params);
   if (!params.success) {
@@ -401,8 +401,8 @@ router.patch("/tickets/:id/resolve-n1", authenticate, requireStaff("f2"), async 
   res.json(await buildTicketDetail(updated, { includeAssignees: true }));
 });
 
-// ── RESOLVE F3 ───────────────────────────────────────────────────────────────
-router.patch("/tickets/:id/resolve", authenticate, requireStaff("f3"), async (req, res): Promise<void> => {
+// ── RESOLVE F1 ───────────────────────────────────────────────────────────────
+router.patch("/tickets/:id/resolve", authenticate, requireStaff("f1"), async (req, res): Promise<void> => {
   const params = ResolveTicketParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -426,7 +426,7 @@ router.patch("/tickets/:id/resolve", authenticate, requireStaff("f3"), async (re
   await db.insert(ticketEventsTable).values({
     ticketId: ticket.id,
     actorId: payload.userId,
-    actorRole: "f3",
+    actorRole: "f1",
     eventType: "resolved_n2",
     oldStatus: "assigned_n2",
     newStatus: "closed_resolved",
@@ -443,7 +443,7 @@ router.patch("/tickets/:id/resolve", authenticate, requireStaff("f3"), async (re
 });
 
 // ── WEBEX CLOSE ───────────────────────────────────────────────────────────────
-router.patch("/tickets/:id/webex", authenticate, requireStaff("f3"), async (req, res): Promise<void> => {
+router.patch("/tickets/:id/webex", authenticate, requireStaff("f1"), async (req, res): Promise<void> => {
   const params = CloseTicketWebexParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -492,7 +492,7 @@ router.patch("/tickets/:id/webex", authenticate, requireStaff("f3"), async (req,
   await db.insert(ticketEventsTable).values({
     ticketId: ticket.id,
     actorId: payload.userId,
-    actorRole: "f3",
+    actorRole: "f1",
     eventType: "webex_invitation",
     oldStatus: "assigned_n2",
     newStatus: "closed_webex",

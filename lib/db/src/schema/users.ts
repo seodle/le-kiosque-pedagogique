@@ -8,7 +8,7 @@ export const usersTable = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: text("role").notNull(), // f2, f3, rd, pg, direction, admin
+  role: text("role").notNull(), // f1, f2, rd, pg, direction, admin
   schoolId: integer("school_id").references(() => schoolsTable.id),
   disciplineId: integer("discipline_id").references(() => disciplinesTable.id),
   active: boolean("active").notNull().default(true),

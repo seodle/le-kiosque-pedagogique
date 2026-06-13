@@ -21,7 +21,7 @@ async function enrichTicket(t: Ticket) {
   };
 }
 
-router.get("/intervener/pool", authenticate, requireStaff("f2", "f3"), async (req, res): Promise<void> => {
+router.get("/intervener/pool", authenticate, requireStaff("f2", "f1"), async (req, res): Promise<void> => {
   const payload = req.authPayload!;
   if (payload.type !== "staff") {
     res.status(403).json({ error: "Forbidden" });
@@ -47,7 +47,7 @@ router.get("/intervener/pool", authenticate, requireStaff("f2", "f3"), async (re
   res.json(await Promise.all(tickets.map(enrichTicket)));
 });
 
-router.get("/intervener/my-tickets", authenticate, requireStaff("f2", "f3"), async (req, res): Promise<void> => {
+router.get("/intervener/my-tickets", authenticate, requireStaff("f2", "f1"), async (req, res): Promise<void> => {
   const payload = req.authPayload!;
   if (payload.type !== "staff") {
     res.status(403).json({ error: "Forbidden" });
@@ -71,7 +71,7 @@ router.get("/intervener/my-tickets", authenticate, requireStaff("f2", "f3"), asy
   res.json(await Promise.all(tickets.map(enrichTicket)));
 });
 
-router.get("/intervener/colleagues", authenticate, requireStaff("f2", "f3"), async (req, res): Promise<void> => {
+router.get("/intervener/colleagues", authenticate, requireStaff("f2", "f1"), async (req, res): Promise<void> => {
   const payload = req.authPayload!;
   if (payload.type !== "staff") {
     res.status(403).json({ error: "Forbidden" });
@@ -105,7 +105,7 @@ router.get("/intervener/colleagues", authenticate, requireStaff("f2", "f3"), asy
     .from(usersTable)
     .where(
       and(
-        eq(usersTable.role, "f3"),
+        eq(usersTable.role, "f1"),
         eq(usersTable.active, true),
         ne(usersTable.id, payload.userId),
       ),

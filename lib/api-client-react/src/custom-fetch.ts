@@ -312,7 +312,7 @@ export async function customFetch<T = unknown>(
         window.location.pathname.startsWith("/tableau-pg")
       ) {
         window.location.href = "/admin/connexion";
-      } else if (window.location.pathname.startsWith("/f2") || window.location.pathname.startsWith("/f3")) {
+      } else if (window.location.pathname.startsWith("/f2") || window.location.pathname.startsWith("/f1")) {
         window.location.href = "/connexion";
       } else {
         window.location.href = "/";

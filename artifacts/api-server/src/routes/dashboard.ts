@@ -188,7 +188,7 @@ router.get("/dashboard/rd", authenticate, requireStaff("rd", "admin", "direction
   const [f2Count] = ticketFilter
     ? await db.select({ c: count() }).from(ticketsTable).where(and(ticketFilter, eq(ticketsTable.status, "closed_n1")))
     : await db.select({ c: count() }).from(ticketsTable).where(eq(ticketsTable.status, "closed_n1"));
-  const [f3Count] = ticketFilter
+  const [f1Count] = ticketFilter
     ? await db.select({ c: count() }).from(ticketsTable).where(and(ticketFilter, eq(ticketsTable.status, "closed_resolved")))
     : await db.select({ c: count() }).from(ticketsTable).where(eq(ticketsTable.status, "closed_resolved"));
   const [webexCount] = ticketFilter
@@ -256,7 +256,7 @@ router.get("/dashboard/rd", authenticate, requireStaff("rd", "admin", "direction
     disciplineName: discipline?.name ?? null,
     resolutionByLevel: {
       f2: Number(f2Count?.c ?? 0),
-      f3: Number(f3Count?.c ?? 0),
+      f1: Number(f1Count?.c ?? 0),
       webex: Number(webexCount?.c ?? 0),
     },
     ticketsByStatus: (byStatus.rows as { status: string; count: string }[]).map((r) => ({

@@ -12,8 +12,8 @@ import Credentials from "@/pages/credentials";
 import MonTicket from "@/pages/mon-ticket";
 import F2 from "@/pages/f2";
 import F2Ticket from "@/pages/f2-ticket";
-import F3 from "@/pages/f3";
-import F3Ticket from "@/pages/f3-ticket";
+import F1 from "@/pages/f1";
+import F1Ticket from "@/pages/f1-ticket";
 import TableauRd from "@/pages/tableau-rd";
 import TableauPg from "@/pages/tableau-pg";
 import TableauAdmin from "@/pages/tableau-admin";
@@ -40,8 +40,8 @@ function Router() {
       <Route path="/mon-ticket" component={MonTicket} />
       <Route path="/f2" component={F2} />
       <Route path="/f2/ticket/:id" component={F2Ticket} />
-      <Route path="/f3" component={F3} />
-      <Route path="/f3/ticket/:id" component={F3Ticket} />
+      <Route path="/f1" component={F1} />
+      <Route path="/f1/ticket/:id" component={F1Ticket} />
       <Route path="/tableau-rd" component={TableauRd} />
       <Route path="/tableau-pg" component={TableauPg} />
       <Route path="/tableau-admin" component={TableauAdmin} />

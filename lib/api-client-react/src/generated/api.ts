@@ -146,7 +146,7 @@ export const getStaffLoginUrl = () => {
 }
 
 /**
- * @summary Login for staff users (F2, F3, RD, PG, direction, admin)
+ * @summary Login for staff users (F1, F2, RD, PG, direction, admin)
  */
 export const staffLogin = async (staffCredentials: StaffCredentials, options?: RequestInit): Promise<AuthResult> => {
 
@@ -195,7 +195,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type StaffLoginMutationError = ErrorType<void>
 
     /**
- * @summary Login for staff users (F2, F3, RD, PG, direction, admin)
+ * @summary Login for staff users (F1, F2, RD, PG, direction, admin)
  */
 export const useStaffLogin = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof staffLogin>>, TError,{data: BodyType<StaffCredentials>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -870,7 +870,7 @@ export const getCloseTicketWebexUrl = (id: number,) => {
 }
 
 /**
- * @summary Schedule a collective visio session (F3 only)
+ * @summary Schedule a collective visio session (F1 only)
  */
 export const closeTicketWebex = async (id: number,
     webexInput: WebexInput, options?: RequestInit): Promise<TicketDetail> => {
@@ -920,7 +920,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CloseTicketWebexMutationError = ErrorType<unknown>
 
     /**
- * @summary Schedule a collective visio session (F3 only)
+ * @summary Schedule a collective visio session (F1 only)
  */
 export const useCloseTicketWebex = <TError = ErrorType<unknown>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicketWebex>>, TError,{id: number;data: BodyType<WebexInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -1014,7 +1014,7 @@ export const getReassignTicketN2Url = (id: number,) => {
 }
 
 /**
- * @summary Reassign a ticket to another F3 (current assignee only)
+ * @summary Reassign a ticket to another F1 (current assignee only)
  */
 export const reassignTicketN2 = async (id: number,
     reassignInput: ReassignInput, options?: RequestInit): Promise<TicketDetail> => {
@@ -1064,7 +1064,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ReassignTicketN2MutationError = ErrorType<void>
 
     /**
- * @summary Reassign a ticket to another F3 (current assignee only)
+ * @summary Reassign a ticket to another F1 (current assignee only)
  */
 export const useReassignTicketN2 = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reassignTicketN2>>, TError,{id: number;data: BodyType<ReassignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}

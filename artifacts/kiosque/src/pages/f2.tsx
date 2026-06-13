@@ -21,8 +21,8 @@ function statusBadge(status: string) {
     closed_webex: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
   };
   const labels: Record<string, string> = {
-    new: "Nouveau", assigned_n1: "En cours", closed_n1: "Résolu", escalated: "Remontée F3",
-    assigned_n2: "En cours F3", closed_webex: "Visio programmée",
+    new: "Nouveau", assigned_n1: "En cours", closed_n1: "Résolu", escalated: "Remontée F1",
+    assigned_n2: "En cours F1", closed_webex: "Visio programmée",
   };
   return { cls: map[status] ?? "bg-muted text-muted-foreground", label: labels[status] ?? status };
 }

@@ -59,7 +59,7 @@ export default function TableauAdmin() {
   const showLoadError = !isLoading && !hasData && (rdError || pgError);
 
   const totalResolved = rd
-    ? (rd.resolutionByLevel.f2 ?? 0) + (rd.resolutionByLevel.f3 ?? 0) + (rd.resolutionByLevel.webex ?? 0)
+    ? (rd.resolutionByLevel.f2 ?? 0) + (rd.resolutionByLevel.f1 ?? 0) + (rd.resolutionByLevel.webex ?? 0)
     : null;
 
   const monthlyTrend = pg?.monthlyTrend ?? [];
@@ -184,10 +184,10 @@ export default function TableauAdmin() {
                   <CardContent className="space-y-4">
                     {[
                       { label: "F2 (personne ressource établissement)", value: rd.resolutionByLevel.f2 ?? 0, color: "bg-blue-500" },
-                      { label: "F3 (personne ressource externe)", value: rd.resolutionByLevel.f3 ?? 0, color: "bg-purple-500" },
+                      { label: "F1 (personne ressource externe)", value: rd.resolutionByLevel.f1 ?? 0, color: "bg-purple-500" },
                       { label: "Visio (entretien)", value: rd.resolutionByLevel.webex ?? 0, color: "bg-green-500" },
                     ].map(({ label, value, color }) => {
-                      const max = Math.max(rd.resolutionByLevel.f2 ?? 0, rd.resolutionByLevel.f3 ?? 0, rd.resolutionByLevel.webex ?? 0, 1);
+                      const max = Math.max(rd.resolutionByLevel.f2 ?? 0, rd.resolutionByLevel.f1 ?? 0, rd.resolutionByLevel.webex ?? 0, 1);
                       return (
                         <div key={label}>
                           <div className="flex justify-between text-sm mb-1">
@@ -257,7 +257,7 @@ export default function TableauAdmin() {
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Établissement</th>
                           <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Demandes</th>
                           <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de résolution</th>
-                          <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée F3</th>
+                          <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée F1</th>
                           <th className="text-right py-2 font-medium text-muted-foreground">Délai moy.</th>
                         </tr>
                       </thead>
@@ -304,7 +304,7 @@ export default function TableauAdmin() {
                           <th className="text-left py-2 pr-4 font-medium text-muted-foreground">Discipline</th>
                           <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Demandes</th>
                           <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de résolution</th>
-                          <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée F3</th>
+                          <th className="text-right py-2 pr-4 font-medium text-muted-foreground">Taux de remontée F1</th>
                           <th className="text-right py-2 font-medium text-muted-foreground">Délai moy.</th>
                         </tr>
                       </thead>

@@ -19,18 +19,18 @@ function statusBadge(status: string) {
     closed_webex: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
   };
   const labels: Record<string, string> = {
-    escalated: "Remontée", assigned_n2: "En cours F3", closed_resolved: "Résolu", closed_webex: "Visio programmée",
+    escalated: "Remontée", assigned_n2: "En cours F1", closed_resolved: "Résolu", closed_webex: "Visio programmée",
   };
   return { cls: map[status] ?? "bg-muted text-muted-foreground", label: labels[status] ?? status };
 }
 
-export default function F3() {
+export default function F1() {
   const [, setLocation] = useLocation();
   const token = getToken();
   const payload = token ? decodeToken(token) : null;
 
   useEffect(() => {
-    if (!token || !payload || payload.role !== "f3") setLocation("/connexion");
+    if (!token || !payload || payload.role !== "f1") setLocation("/connexion");
   }, []);
 
   const { data: pool, isLoading: poolLoading } = useGetPool({ query: { refetchInterval: 15000 } as any });
@@ -69,7 +69,7 @@ export default function F3() {
                 <TicketPoolCard
                   key={t.id}
                   ticket={t}
-                  ticketHref={`/f3/ticket/${t.id}`}
+                  ticketHref={`/f1/ticket/${t.id}`}
                   statusClassName={cls}
                   statusLabel={label}
                 />
@@ -102,7 +102,7 @@ export default function F3() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium", cls)}>{label}</span>
-                      <Link href={`/f3/ticket/${t.id}`}>
+                      <Link href={`/f1/ticket/${t.id}`}>
                         <Button size="sm" variant="outline" className="gap-1">Voir <ArrowRight className="h-3.5 w-3.5" /></Button>
                       </Link>
                     </div>
@@ -137,7 +137,7 @@ export default function F3() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={cn("px-2.5 py-1 rounded-full text-xs font-medium", cls)}>{label}</span>
-                      <Link href={`/f3/ticket/${t.id}`}>
+                      <Link href={`/f1/ticket/${t.id}`}>
                         <Button size="sm" variant="outline" className="gap-1">Voir <ArrowRight className="h-3.5 w-3.5" /></Button>
                       </Link>
                     </div>

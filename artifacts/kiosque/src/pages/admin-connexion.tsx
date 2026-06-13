@@ -48,7 +48,7 @@ export default function AdminConnexion() {
         if (!role || !isOversightRole(role)) {
           toast({
             title: "Accès refusé",
-            description: "Ce compte est réservé aux personnes ressources F2/F3. Utilisez l'espace personnes ressources.",
+            description: "Ce compte est réservé aux personnes ressources F1/F2. Utilisez l'espace personnes ressources.",
             variant: "destructive",
           });
           return;
@@ -120,7 +120,7 @@ export default function AdminConnexion() {
               </Link>
               {" · "}
               <Link href="/connexion" className="underline hover:text-foreground">
-                Espace personnes ressources (F2/F3)
+                Espace personnes ressources (F1/F2)
               </Link>
             </p>
           </CardContent>

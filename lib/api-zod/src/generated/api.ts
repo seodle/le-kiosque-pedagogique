@@ -17,7 +17,7 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary Login for staff users (F2, F3, RD, PG, direction, admin)
+ * @summary Login for staff users (F1, F2, RD, PG, direction, admin)
  */
 export const staffLoginBodyUsernameMin = 2;
 
@@ -319,7 +319,7 @@ export const ResolveTicketResponse = zod.object({
 
 
 /**
- * @summary Schedule a collective visio session (F3 only)
+ * @summary Schedule a collective visio session (F1 only)
  */
 export const CloseTicketWebexParams = zod.object({
   "id": zod.coerce.number()
@@ -396,7 +396,7 @@ export const ReassignTicketN1Response = zod.object({
 
 
 /**
- * @summary Reassign a ticket to another F3 (current assignee only)
+ * @summary Reassign a ticket to another F1 (current assignee only)
  */
 export const ReassignTicketN2Params = zod.object({
   "id": zod.coerce.number()
@@ -545,7 +545,7 @@ export const GetDashboardRdResponse = zod.object({
   "avgPickupMinutes": zod.number().nullable(),
   "resolutionByLevel": zod.object({
   "f2": zod.number().optional(),
-  "f3": zod.number().optional(),
+  "f1": zod.number().optional(),
   "webex": zod.number().optional()
 }),
   "ticketsByStatus": zod.array(zod.object({
@@ -556,8 +556,8 @@ export const GetDashboardRdResponse = zod.object({
   "disciplineId": zod.number(),
   "disciplineName": zod.string(),
   "totalTickets": zod.number(),
-  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
-  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F1'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F1, F2 ou Webex)'),
   "avgMinutes": zod.number().nullable()
 })).optional().describe('Statistiques par discipline (vue direction, périmètre établissement)')
 })
@@ -617,16 +617,16 @@ export const GetDashboardPgResponse = zod.object({
   "schoolId": zod.number(),
   "schoolName": zod.string(),
   "totalTickets": zod.number(),
-  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
-  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F1'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F1, F2 ou Webex)'),
   "avgMinutes": zod.number().nullable()
 })),
   "disciplineRankings": zod.array(zod.object({
   "disciplineId": zod.number(),
   "disciplineName": zod.string(),
   "totalTickets": zod.number(),
-  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F3'),
-  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F2, F3 ou Webex)'),
+  "escalationRate": zod.number().describe('Percentage 0–100 of tickets remontés vers F1'),
+  "resolutionRate": zod.number().describe('Percentage 0–100 of tickets résolus (F1, F2 ou Webex)'),
   "avgMinutes": zod.number().nullable()
 }))
 })

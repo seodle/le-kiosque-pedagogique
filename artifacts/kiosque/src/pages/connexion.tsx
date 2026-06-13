@@ -63,7 +63,7 @@ export default function Connexion() {
           <CardHeader className="space-y-2 text-center pb-6">
             <CardTitle className="text-2xl">Espace Personnes Ressources</CardTitle>
             <CardDescription>
-              Connexion réservée aux personnes ressources F2 et F3.
+              Connexion réservée aux personnes ressources F1 et F2.
             </CardDescription>
           </CardHeader>
           <CardContent>

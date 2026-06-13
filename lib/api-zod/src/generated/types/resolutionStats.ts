@@ -8,6 +8,6 @@
 
 export interface ResolutionStats {
   f2?: number;
-  f3?: number;
+  f1?: number;
   webex?: number;
 }

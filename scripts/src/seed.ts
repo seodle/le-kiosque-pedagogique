@@ -166,8 +166,8 @@ async function seed() {
         disciplineId: (school.name === "Renard" ? francais : maths)?.id,
       });
     }
-    await ensureUser("f3.alice", "admin1234", "f3");
-    await ensureUser("f3.bob", "admin1234", "f3");
+    await ensureUser("f1.alice", "admin1234", "f1");
+    await ensureUser("f1.bob", "admin1234", "f1");
     const boisCaran = schools.find((s) => s.name === "Bois-Caran");
     await ensureUser("rd.paris", "admin1234", "rd", { schoolId: boisCaran?.id, disciplineId: maths?.id });
     await ensureUser("pg", "admin1234", "pg", { disciplineId: maths?.id });

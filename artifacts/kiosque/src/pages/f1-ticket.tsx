@@ -31,14 +31,14 @@ import { useSendTicketMessage } from "@/hooks/use-send-ticket-message";
 function statusLabel(status: string) {
   const map: Record<string, { label: string; color: string }> = {
     escalated: { label: "Remontée", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-    assigned_n2: { label: "Pris en charge (F3)", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" },
-    closed_resolved: { label: "Résolu F3", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
+    assigned_n2: { label: "Pris en charge (F1)", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" },
+    closed_resolved: { label: "Résolu F1", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
     closed_webex: { label: "Visio programmée", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
   };
   return map[status] ?? { label: status, color: "bg-muted text-muted-foreground" };
 }
 
-export default function F3Ticket() {
+export default function F1Ticket() {
   const [, setLocation] = useLocation();
   const params = useParams<{ id: string }>();
   const ticketId = Number(params.id);
@@ -55,7 +55,7 @@ export default function F3Ticket() {
   const payload = token ? decodeToken(token) : null;
 
   useEffect(() => {
-    if (!token || !payload || payload.role !== "f3") setLocation("/connexion");
+    if (!token || !payload || payload.role !== "f1") setLocation("/connexion");
   }, []);
 
   const { data: ticket, isLoading: ticketLoading } = useGetTicket(
@@ -145,14 +145,14 @@ export default function F3Ticket() {
   function handleReassigned() {
     toast({ title: "Demande transférée" });
     invalidate();
-    setLocation("/f3");
+    setLocation("/f1");
   }
 
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto py-6 space-y-6">
         <div className="flex items-center gap-3">
-          <Link href="/f3">
+          <Link href="/f1">
             <Button variant="ghost" size="sm" className="gap-1">
               <ArrowLeft className="h-4 w-4" />Retour
             </Button>
@@ -249,7 +249,7 @@ export default function F3Ticket() {
                 <ReassignTicketDialog
                   ticketId={ticketId}
                   level="n2"
-                  roleLabel="F3"
+                  roleLabel="F1"
                   onSuccess={handleReassigned}
                 />
               </>
@@ -258,7 +258,7 @@ export default function F3Ticket() {
               <ReassignTicketDialog
                 ticketId={ticketId}
                 level="n2"
-                roleLabel="F3"
+                roleLabel="F1"
                 onSuccess={handleReassigned}
               />
             )}

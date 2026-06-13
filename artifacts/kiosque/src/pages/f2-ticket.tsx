@@ -26,8 +26,8 @@ function statusLabel(status: string) {
   const map: Record<string, { label: string; color: string }> = {
     new: { label: "Nouveau", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" },
     assigned_n1: { label: "Pris en charge (F2)", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
-    escalated: { label: "Remontée vers F3", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
-    assigned_n2: { label: "En cours F3", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" },
+    escalated: { label: "Remontée vers F1", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" },
+    assigned_n2: { label: "En cours F1", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300" },
     closed_webex: { label: "Visio programmée", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" },
     closed_n1: { label: "Résolu F2", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300" },
   };
@@ -91,7 +91,7 @@ export default function F2Ticket() {
   function handleEscalate() {
     escalate({ id: ticketId }, {
       onSuccess: () => {
-        toast({ title: "Demande remontée vers F3" });
+        toast({ title: "Demande remontée vers F1" });
         setEscalateOpen(false);
         invalidate();
         setLocation("/f2");
@@ -190,7 +190,7 @@ export default function F2Ticket() {
                   <DialogTrigger asChild>
                     <Button variant="outline" className="gap-2">
                       <ArrowUpCircle className="h-4 w-4" />
-                      Remonter vers F3
+                      Remonter vers F1
                     </Button>
                   </DialogTrigger>
                   <DialogContent>

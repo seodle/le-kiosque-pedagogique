@@ -101,7 +101,7 @@ type MockTicket = {
   schoolId: number;
   disciplineId: number;
   f2Id?: number;
-  f3Id?: number;
+  f1Id?: number;
   daysAgo: number;
   pickupMinutes?: number;
   webex?: boolean;
@@ -129,17 +129,17 @@ function buildTicketPlan(
   const plan: MockTicket[] = [];
   let day = 0;
 
-  const statusWeights: { status: string; count: number; needsF2?: boolean; needsF3?: boolean; escalate?: boolean; webex?: boolean }[] = [
+  const statusWeights: { status: string; count: number; needsF2?: boolean; needsF1?: boolean; escalate?: boolean; webex?: boolean }[] = [
     { status: "new", count: 10 },
     { status: "assigned_n1", count: 8, needsF2: true },
     { status: "escalated", count: 12, needsF2: true, escalate: true },
-    { status: "assigned_n2", count: 6, needsF2: true, needsF3: true, escalate: true },
+    { status: "assigned_n2", count: 6, needsF2: true, needsF1: true, escalate: true },
     { status: "closed_n1", count: 28, needsF2: true },
-    { status: "closed_resolved", count: 22, needsF2: true, needsF3: true, escalate: true },
-    { status: "closed_webex", count: 14, needsF2: true, needsF3: true, escalate: true, webex: true },
+    { status: "closed_resolved", count: 22, needsF2: true, needsF1: true, escalate: true },
+    { status: "closed_webex", count: 14, needsF2: true, needsF1: true, escalate: true, webex: true },
   ];
 
-  for (const { status, count, needsF2, needsF3, escalate, webex } of statusWeights) {
+  for (const { status, count, needsF2, needsF1, escalate, webex } of statusWeights) {
     for (let i = 0; i < count; i++) {
       const school = pick(schools, day + i);
       const discipline = pick(disciplines, day * 2 + i);
@@ -169,14 +169,14 @@ async function insertTicket(
   mock: MockTicket,
   passwordHash: string,
   f2Users: { id: number; schoolId: number | null }[],
-  f3Users: { id: number }[],
+  f1Users: { id: number }[],
   disciplineName: string,
 ) {
   const createdAt = daysAgo(mock.daysAgo, 9 + (mock.daysAgo % 6));
   const description = pickDescription(disciplineName, mock.schoolId + mock.disciplineId);
 
   const f2 = f2Users.find((u) => u.schoolId === mock.schoolId) ?? f2Users[0];
-  const f3 = pick(f3Users, mock.disciplineId);
+  const f1 = pick(f1Users, mock.disciplineId);
   const visioLink = "https://exemple.academie.fr/visio/reunion-kiosque";
   const visioScheduledAt = mock.webex ? addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 24 * 60) : null;
   const visioWhenLabel = visioScheduledAt
@@ -197,7 +197,7 @@ async function insertTicket(
     description,
     status: mock.status,
     assignedN1Id: mock.status !== "new" ? f2?.id : null,
-    assignedN2Id: ["assigned_n2", "closed_resolved", "closed_webex"].includes(mock.status) ? f3?.id : null,
+    assignedN2Id: ["assigned_n2", "closed_resolved", "closed_webex"].includes(mock.status) ? f1?.id : null,
     webexLink: mock.webex ? visioLink : null,
     webexScheduledAt: visioScheduledAt,
     webexCreatedAt: mock.webex ? addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 120) : null,
@@ -251,8 +251,8 @@ async function insertTicket(
       const claimedN2At = addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 90);
       events.push({
         eventType: "claimed_n2",
-        actorRole: "f3",
-        actorId: f3?.id ?? null,
+        actorRole: "f1",
+        actorId: f1?.id ?? null,
         oldStatus: "escalated",
         newStatus: "assigned_n2",
         at: claimedN2At,
@@ -273,8 +273,8 @@ async function insertTicket(
     if (mock.status === "closed_resolved") {
       events.push({
         eventType: "resolved_n2",
-        actorRole: "f3",
-        actorId: f3?.id ?? null,
+        actorRole: "f1",
+        actorId: f1?.id ?? null,
         oldStatus: "assigned_n2",
         newStatus: "closed_resolved",
         at: addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 240),
@@ -284,8 +284,8 @@ async function insertTicket(
     if (mock.status === "closed_webex") {
       events.push({
         eventType: "webex_invitation",
-        actorRole: "f3",
-        actorId: f3?.id ?? null,
+        actorRole: "f1",
+        actorId: f1?.id ?? null,
         oldStatus: "assigned_n2",
         newStatus: "closed_webex",
         at: addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 200),
@@ -333,8 +333,8 @@ async function insertTicket(
 
   if (["assigned_n2", "closed_resolved", "closed_webex"].includes(mock.status)) {
     msgs.push({
-      senderType: "f3",
-      senderId: f3?.id ?? null,
+      senderType: "f1",
+      senderId: f1?.id ?? null,
       content: "Je prends le relais sur cette demande remontée.",
       at: addMinutes(createdAt, (mock.pickupMinutes ?? 30) + 100),
     });
@@ -372,15 +372,15 @@ async function seedMock() {
   const schools = await db.select().from(schoolsTable).where(eq(schoolsTable.active, true));
   const disciplines = await db.select().from(disciplinesTable).where(eq(disciplinesTable.active, true));
   const f2Users = await db.select().from(usersTable).where(eq(usersTable.role, "f2"));
-  const f3Users = await db.select().from(usersTable).where(eq(usersTable.role, "f3"));
+  const f1Users = await db.select().from(usersTable).where(eq(usersTable.role, "f1"));
 
   if (!schools.length || !disciplines.length) {
     console.error("Établissements ou disciplines manquants — lancez d'abord : pnpm --filter @workspace/scripts run seed");
     process.exit(1);
   }
 
-  if (!f2Users.length || !f3Users.length) {
-    console.error("Comptes F2/F3 manquants — lancez d'abord : pnpm --filter @workspace/scripts run seed:demo");
+  if (!f2Users.length || !f1Users.length) {
+    console.error("Comptes F1/F2 manquants — lancez d'abord : pnpm --filter @workspace/scripts run seed:demo");
     process.exit(1);
   }
 
@@ -402,7 +402,7 @@ async function seedMock() {
   let count = 0;
   for (const mock of plan) {
     const disciplineName = disciplineById.get(mock.disciplineId) ?? "";
-    await insertTicket(mock, passwordHash, f2Users, f3Users, disciplineName);
+    await insertTicket(mock, passwordHash, f2Users, f1Users, disciplineName);
     count++;
     if (count % 20 === 0) console.log(`  … ${count}/${plan.length} tickets`);
   }
