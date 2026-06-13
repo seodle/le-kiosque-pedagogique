@@ -11,24 +11,9 @@ export function Footer() {
             className="h-14 w-auto object-contain"
           />
         </a>
-        <div className="max-w-xl space-y-2">
-          <p>
-            Une solution{" "}
-            <a
-              href="https://evalution-asso.ch/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-foreground underline hover:no-underline"
-            >
-              evꜵlution
-            </a>
-          </p>
-          <p>
-            <Link href="/admin/connexion" className="text-xs underline hover:text-foreground">
-              Accès administration
-            </Link>
-          </p>
-        </div>
+        <Link href="/admin/connexion" className="text-xs underline hover:text-foreground">
+          Accès administration
+        </Link>
       </div>
     </footer>
   );
